@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Goolee Numberlink">
+<meta name="theme-color" content="#071426">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071426">
+<title>GOOLEE Numberlink — Play Edition v4.4 — Living Button QA</title>
+<style>
+:root{
+  --bg:#06101f;--bg2:#0b1a30;--panel:#0d213c;--panel2:#102a49;--line:rgba(255,255,255,.10);
+  --text:#f7f9fc;--muted:#a9bdd3;--cyan:#4fd3ff;--gold:#ffd166;--green:#60d9a6;--red:#ff7086;
+  --shadow:0 18px 50px rgba(0,0,0,.28);--radius:24px;--cell:#173657;--cell2:#1d4167;
+  --tap:50px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:
+  radial-gradient(circle at 15% 0%,rgba(79,211,255,.12),transparent 32%),
+  radial-gradient(circle at 85% 15%,rgba(168,140,255,.10),transparent 28%),
+  linear-gradient(180deg,#08172b 0%,#05101e 70%,#030b15 100%);
+  color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{min-height:100vh}
+button,select{font:inherit}
+button{min-height:var(--tap);border:0;border-radius:16px;font-weight:850;cursor:pointer}
+button:focus-visible,.cell:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.hidden{display:none!important}
+.app{max-width:1180px;margin:auto;padding:18px 16px 40px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.brand{font-weight:950;letter-spacing:.02em;font-size:clamp(21px,4vw,30px)}
+.brand span{color:var(--cyan)}
+.iconbtn{width:52px;height:52px;background:#10233e;color:#fff;border:1px solid var(--line);display:grid;place-items:center}
+.hero{background:linear-gradient(145deg,rgba(16,42,73,.96),rgba(8,27,50,.96));border:1px solid var(--line);box-shadow:var(--shadow);border-radius:30px;padding:22px}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:#91a9c3;font-weight:900}
+h1{font-size:clamp(32px,6vw,58px);line-height:1.0;margin:7px 0 10px;letter-spacing:-.04em}
+.sub{color:#c3d2e2;line-height:1.55;max-width:760px}
+.smart{margin-top:18px;width:100%;background:linear-gradient(90deg,#48d0ff,#6de0b1);color:#051321;font-size:17px;padding:15px}
+.menugrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}
+.levelcard{position:relative;text-align:left;padding:16px;background:linear-gradient(145deg,#102a49,#0b1f39);color:#fff;border:1px solid var(--line);min-height:124px;overflow:hidden}
+.levelcard::after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:-40px;bottom:-50px;background:rgba(255,255,255,.035)}
+.levelcard .n{font-size:24px;font-weight:950}.levelcard .meta{color:#a9bdd3;font-size:12px;margin-top:3px}
+.levelcard .prog{margin-top:15px;height:6px;background:#061426;border-radius:999px;overflow:hidden}
+.levelcard .fill{height:100%;background:linear-gradient(90deg,#4fd3ff,#60d9a6)}
+.levelcard.locked{opacity:.55}
+.levelcard.locked::before{content:"LOCKED";position:absolute;top:12px;right:12px;font-size:9px;letter-spacing:.12em;color:#ffd166}
+.home-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.stat{background:#0b1d35;border:1px solid var(--line);border-radius:18px;padding:13px;text-align:center}
+.stat b{display:block;font-size:21px}.stat span{color:#91a9c3;font-size:11px}
+.footer-note{color:#7990aa;font-size:11px;line-height:1.5;margin-top:18px;text-align:center}
+
+.gameShell{display:grid;grid-template-columns:minmax(0,760px) minmax(240px,1fr);gap:16px;align-items:start}
+.gameMain,.side{background:linear-gradient(145deg,#0e233f,#091b32);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow)}
+.gameMain{padding:16px}.side{padding:14px;position:sticky;top:12px}
+.gameHeader{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.puzzleTitle{font-size:clamp(21px,4vw,30px);font-weight:950}.puzzleMeta{color:#9eb2c9;font-size:12px;margin-top:3px}
+.energy{min-width:105px;text-align:right}.energy b{font-size:18px}.energy small{display:block;color:#91a9c3}
+.boardWrap{margin:14px auto 10px;max-width:min(78vh,720px);width:100%;position:relative}
+.board{display:grid;gap:3px;aspect-ratio:1;background:#04101f;border:1px solid rgba(255,255,255,.12);padding:6px;border-radius:22px;box-shadow:inset 0 0 0 1px rgba(79,211,255,.04),0 15px 40px rgba(0,0,0,.22);touch-action:none;user-select:none}
+.cell{position:relative;background:linear-gradient(145deg,var(--cell2),var(--cell));border-radius:5px;border:1px solid rgba(255,255,255,.05);min-width:0;min-height:0}
+.cell.path{background:color-mix(in srgb,var(--pc) 32%,#173657)}
+.cell.head{box-shadow:inset 0 0 0 3px var(--pc),0 0 14px color-mix(in srgb,var(--pc) 70%,transparent)}
+.endpoint{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:72%;aspect-ratio:1;border-radius:50%;background:#061426;border:3px solid var(--pc);display:grid;place-items:center;font-weight:950;font-size:clamp(10px,2.8vw,22px);box-shadow:0 0 0 2px rgba(0,0,0,.16),0 0 14px color-mix(in srgb,var(--pc) 40%,transparent)}
+.endpoint.done{background:color-mix(in srgb,var(--pc) 20%,#061426)}
+.endpoint .shape{display:none}
+.endpoint{overflow:visible;transition:transform .12s ease,box-shadow .18s ease,filter .18s ease;
+ background:radial-gradient(circle at 36% 28%,color-mix(in srgb,var(--pc) 65%,white),var(--pc) 34%,#061426 74%);
+ box-shadow:inset 0 2px 5px rgba(255,255,255,.24),inset 0 -4px 7px rgba(0,0,0,.32),0 3px 0 rgba(0,0,0,.38),0 0 14px color-mix(in srgb,var(--pc) 38%,transparent)}
+.endpoint.living-active{transform:translate(-50%,-50%) scale(.94);filter:brightness(1.12);box-shadow:inset 0 2px 5px rgba(255,255,255,.3),inset 0 -3px 5px rgba(0,0,0,.25),0 1px 0 rgba(0,0,0,.35),0 0 18px color-mix(in srgb,var(--pc) 60%,transparent)}
+.endpoint .goolee-face{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .12s ease}
+.endpoint.living-active .goolee-face,.endpoint.living-smile .goolee-face,.endpoint.living-think .goolee-face,.endpoint.living-puzzled .goolee-face{opacity:1}
+.goolee-eye{position:absolute;top:27%;width:17%;height:18%;background:#fff;border-radius:50%;box-shadow:0 1px 2px #0006}
+.goolee-eye.e1{left:25%}.goolee-eye.e2{right:25%}
+.goolee-eye:after{content:"";position:absolute;width:43%;height:48%;left:29%;top:30%;background:#071426;border-radius:50%}
+.goolee-mouth{position:absolute;left:37%;top:61%;width:26%;height:8%;border-bottom:2px solid #fff;border-radius:0 0 50% 50%;opacity:.92}
+.endpoint.living-smile{animation:gooleeCelebrate .52s ease 1}
+.endpoint.living-smile .goolee-mouth{height:13%;border-bottom-width:3px}
+.endpoint.living-think .goolee-eye{height:5%;top:34%;border-radius:50%}
+.endpoint.living-think .goolee-eye:after{display:none}
+.endpoint.living-think .goolee-mouth{width:15%;left:42.5%;border-radius:50%;transform:rotate(-4deg)}
+.endpoint.living-puzzled{animation:gooleePuzzled .28s ease 1}
+.endpoint.living-puzzled .goolee-mouth{width:15%;left:42.5%;border-radius:50%}
+.endpoint.board-celebrate{animation:gooleeCelebrate .65s ease 1}
+@keyframes gooleeCelebrate{0%,100%{transform:translate(-50%,-50%) scale(1)}45%{transform:translate(-50%,-58%) scale(1.10)}}
+@keyframes gooleePuzzled{0%,100%{transform:translate(-50%,-50%)}35%{transform:translate(-55%,-50%)}70%{transform:translate(-45%,-50%)}}
+body.reduced .endpoint{transition:none}body.reduced .endpoint.living-smile,body.reduced .endpoint.living-puzzled,body.reduced .endpoint.board-celebrate{animation:none}
+
+.feedback{min-height:58px;margin:10px 0 10px;padding:12px 14px;border-radius:17px;background:#08182c;border:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.feedback .dot{width:10px;height:10px;border-radius:50%;background:#6f879f;flex:0 0 auto}.feedback.good .dot{background:var(--green);box-shadow:0 0 10px rgba(96,217,166,.8)}.feedback.bad .dot{background:var(--red)}
+.feedback b{font-size:13px}.feedback span{color:#9fb4cb;font-size:12px;display:block;margin-top:2px}
+.controls{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.ctrl{background:#132d4b;color:#fff;border:1px solid var(--line)}.ctrl.danger{background:#2c1f2c;color:#ffb7c3}
+.backMain{margin-top:10px;width:100%;background:#f3f7fb;color:#071426;font-size:15px}
+.side h3{margin:3px 0 12px;font-size:15px}
+.metricGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metric{background:#08192e;border:1px solid var(--line);border-radius:15px;padding:11px}
+.metric span{display:block;color:#8fa5bd;font-size:10px}.metric b{font-size:18px}
+.scoreList{margin-top:12px;max-height:290px;overflow:auto}
+.scoreRow{display:grid;grid-template-columns:1fr auto;gap:8px;border-top:1px solid rgba(255,255,255,.07);padding:8px 2px;font-size:11px}
+.scoreRow small{color:#8298b1}.scoreRow b{font-size:12px}
+.sideNote{color:#7890aa;font-size:10px;line-height:1.45;margin-top:12px}
+
+.overlay{position:fixed;z-index:50;inset:0;background:rgba(2,9,18,.78);backdrop-filter:blur(10px);display:grid;place-items:center;padding:16px}
+.modal{width:min(560px,100%);background:linear-gradient(145deg,#102a49,#091b31);border:1px solid var(--line);border-radius:28px;box-shadow:0 30px 80px rgba(0,0,0,.45);padding:20px}
+.modal h2{font-size:30px;margin:0 0 8px}.modal p{color:#b4c5d8;line-height:1.5}
+.modalActions{display:grid;gap:9px;margin-top:15px}.primary{background:linear-gradient(90deg,#4fd3ff,#64dda8);color:#051321}.secondary{background:#132d4b;color:#fff;border:1px solid var(--line)}.white{background:#f5f8fc;color:#071426}
+.settingsRow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;border-top:1px solid rgba(255,255,255,.08)}
+#board.thinking-breathe{animation:thinkingBreathe 3.2s ease-in-out infinite}
+#board .cell.thinking-head::after{content:"";position:absolute;inset:18%;border:2px solid rgba(255,209,102,.8);border-radius:50%;animation:thinkingHead 1.8s ease-in-out infinite;pointer-events:none}
+#hintBtn.thinking-hint{animation:thinkingHint 2.2s ease-in-out 2}
+@keyframes thinkingBreathe{0%,100%{filter:brightness(1)}50%{filter:brightness(1.045)}}
+@keyframes thinkingHead{0%,100%{opacity:.28;transform:scale(.88)}50%{opacity:.9;transform:scale(1.08)}}
+@keyframes thinkingHint{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 3px rgba(255,209,102,.24),0 0 16px rgba(255,209,102,.35)}}
+body.reduced #board.thinking-breathe,body.reduced #board .cell.thinking-head::after,body.reduced #hintBtn.thinking-hint{animation:none}
+
+.switch{min-width:70px;background:#132d4b;color:#fff}.switch.on{background:#64dda8;color:#051321}
+.achievement{font-size:12px;color:#061426;background:#ffd166;border-radius:999px;padding:7px 10px;font-weight:950;display:inline-block;margin:4px 4px 0 0}
+.levelselect{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.puzzleBtn{background:#122b48;color:#fff;border:1px solid var(--line)}.puzzleBtn.done{box-shadow:inset 0 0 0 2px #60d9a6}.puzzleBtn.current{background:#4fd3ff;color:#04101f}
+.toast{position:fixed;z-index:90;left:50%;bottom:24px;transform:translateX(-50%);background:#f5f8fc;color:#071426;padding:10px 14px;border-radius:999px;font-weight:850;font-size:12px;box-shadow:var(--shadow);pointer-events:none}
+.confetti{position:fixed;z-index:80;width:10px;height:16px;border-radius:3px;pointer-events:none;animation:fall 1.35s ease-out forwards}
+@keyframes fall{0%{transform:translateY(-10vh) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(540deg);opacity:0}}
+@keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.14)}}
+.cell.flash .endpoint{animation:pulse .28s ease}
+body.reduced *{animation:none!important;transition:none!important}
+body.contrast{--cell:#102a46;--cell2:#183b60;--muted:#d6e0ec}.contrast .endpoint{border-width:4px}
+.contrast .endpoint .shape{display:block;position:absolute;right:-6px;bottom:-6px;background:#fff;color:#071426;border-radius:999px;font-size:8px;width:18px;height:18px;display:grid;place-items:center}
+@media(max-width:880px){.gameShell{grid-template-columns:1fr}.side{position:static}.menugrid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){
+  .app{padding:10px 10px 28px}.hero{padding:17px}.menugrid{grid-template-columns:1fr}
+  .controls{grid-template-columns:repeat(2,1fr)}.home-stats{grid-template-columns:1fr 1fr 1fr}
+  .gameMain{padding:10px;border-radius:20px}.board{padding:4px;gap:2px;border-radius:16px}
+  .levelselect{grid-template-columns:repeat(4,1fr)}
+}
+html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%;touch-action:manipulation}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+#board{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+button{-webkit-tap-highlight-color:transparent}
+</style>
+<link rel="manifest" href="./manifest.webmanifest">\n</head>
+<body>
+<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#fff3cd;color:#3b3214;text-align:center;padding:6px 10px;font:700 12px/1.2 system-ui;box-shadow:0 1px 5px #0002">QA TEST MODE · ALL 56 PUZZLES UNLOCKED</div>
+<div style="height:28px"></div>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">GOOLEE <span>Numberlink</span></div>
+    <button class="iconbtn" id="settingsTop" aria-label="Settings">⚙</button>
+  </div>
+
+  <section id="home">
+    <div class="hero">
+      <div class="eyebrow">PLAY • THINK • FLOW</div>
+      <h1>Connect every pair.<br>Fill every space.</h1>
+      <div class="sub">Seven progressive levels, 56 puzzles · QA all-unlocked build, numbered colour-coded endpoints, and a clean play experience built for confident progression.</div>
+      <button id="smartStart" class="smart">PLAY WARMUP · PUZZLE 1</button>
+    </div>
+    <div class="home-stats">
+      <div class="stat"><b id="homeEnergy">0</b><span>Thinking Energy</span></div>
+      <div class="stat"><b id="homeSolved">0/56</b><span>Puzzles Solved</span></div>
+      <div class="stat"><b id="homeBest">—</b><span>Best Score</span></div>
+    </div>
+    <div id="levelCards" class="menugrid"></div>
+    <div class="footer-note">Play Mode records gameplay events locally for progress, scoring and system improvement. GOOLEE PLAY SCORE™ is a game-performance score, not a cognitive score. It does not display or claim a cognitive diagnosis or psychological profile.</div>
+  </section>
+
+  <section id="game" class="hidden">
+    <div class="gameShell">
+      <main class="gameMain">
+        <div class="gameHeader">
+          <div>
+            <div class="puzzleTitle" id="puzzleTitle">WarmUp · Puzzle 1</div>
+            <div class="puzzleMeta" id="puzzleMeta">5×5 · 3 pairs</div>
+          </div>
+          <div class="energy"><b>⚡ <span id="energyNow">0</span></b><small>Thinking Energy</small></div>
+        </div>
+        <div class="boardWrap"><div id="board" class="board"></div></div>
+        <div id="feedback" class="feedback"><div class="dot"></div><div><b>Ready</b><span>Connect matching numbers and fill every cell.</span></div></div>
+        <div class="controls">
+          <button class="ctrl" id="hintBtn">Hint</button>
+          <button class="ctrl" id="pauseBtn">Pause</button>
+          <button class="ctrl" id="soundBtn">Sound: On</button>
+          <button class="ctrl danger" id="resetBtn">Reset</button>
+        </div>
+        <button class="backMain" id="backBtn">← BACK TO MAIN MENU</button>
+      </main>
+      <aside class="side">
+        <h3>Live Performance</h3>
+        <div class="metricGrid">
+          <div class="metric"><span>TIME</span><b id="timeMetric">0:00</b></div>
+          <div class="metric"><span>MOVES</span><b id="movesMetric">0</b></div>
+          <div class="metric"><span>EFFICIENCY</span><b id="effMetric">100%</b></div>
+          <div class="metric"><span>PLAY SCORE</span><b id="scoreMetric">10000</b></div>
+        </div>
+        <h3 style="margin-top:16px">Player Scoreboard</h3>
+        <div id="scoreList" class="scoreList"></div>
+        <button class="ctrl" style="width:100%;margin-top:10px" id="choosePuzzle">Choose Puzzle</button>
+        <div class="sideNote">Successful attempts and personal bests are stored on this device. Event telemetry remains local in this prototype.</div>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<div id="modal" class="overlay hidden"><div id="modalCard" class="modal"></div></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const BANK={"WarmUp":[{"id":"GN-WU-0001","level":"WarmUp","puzzle_no":1,"grid":5,"pair_count":3,"pairs":[{"id":1,"start":[2,2],"end":[0,0]},{"id":2,"start":[0,1],"end":[3,0]},{"id":3,"start":[3,1],"end":[1,3]}],"solution":[{"id":1,"path":[[2,2],[1,2],[1,1],[2,1],[2,0],[1,0],[0,0]]},{"id":2,"path":[[0,1],[0,2],[0,3],[0,4],[1,4],[2,4],[3,4],[4,4],[4,3],[4,2],[4,1],[4,0],[3,0]]},{"id":3,"path":[[3,1],[3,2],[3,3],[2,3],[1,3]]}],"metrics":{"solution_turns":8,"avg_path_cells":8.33}},{"id":"GN-WU-0002","level":"WarmUp","puzzle_no":2,"grid":5,"pair_count":3,"pairs":[{"id":1,"start":[2,2],"end":[0,3]},{"id":2,"start":[0,2],"end":[3,0]},{"id":3,"start":[4,0],"end":[3,1]}],"solution":[{"id":1,"path":[[2,2],[1,2],[1,3],[2,3],[2,4],[1,4],[0,4],[0,3]]},{"id":2,"path":[[0,2],[0,1],[0,0],[1,0],[1,1],[2,1],[2,0],[3,0]]},{"id":3,"path":[[4,0],[4,1],[4,2],[4,3],[4,4],[3,4],[3,3],[3,2],[3,1]]}],"metrics":{"solution_turns":12,"avg_path_cells":8.33}},{"id":"GN-WU-0003","level":"WarmUp","puzzle_no":3,"grid":5,"pair_count":3,"pairs":[{"id":1,"start":[3,3],"end":[3,1]},{"id":2,"start":[3,2],"end":[1,0]},{"id":3,"start":[0,0],"end":[0,4]}],"solution":[{"id":1,"path":[[3,3],[3,4],[4,4],[4,3],[4,2],[4,1],[4,0],[3,0],[2,0],[2,1],[3,1]]},{"id":2,"path":[[3,2],[2,2],[1,2],[1,1],[1,0]]},{"id":3,"path":[[0,0],[0,1],[0,2],[0,3],[1,3],[2,3],[2,4],[1,4],[0,4]]}],"metrics":{"solution_turns":9,"avg_path_cells":8.33}},{"id":"GN-WU-0004","level":"WarmUp","puzzle_no":4,"grid":5,"pair_count":3,"pairs":[{"id":1,"start":[0,2],"end":[4,3]},{"id":2,"start":[4,2],"end":[1,0]},{"id":3,"start":[0,0],"end":[2,2]}],"solution":[{"id":1,"path":[[0,2],[0,3],[0,4],[1,4],[2,4],[3,4],[4,4],[4,3]]},{"id":2,"path":[[4,2],[4,1],[4,0],[3,0],[3,1],[2,1],[2,0],[1,0]]},{"id":3,"path":[[0,0],[0,1],[1,1],[1,2],[1,3],[2,3],[3,3],[3,2],[2,2]]}],"metrics":{"solution_turns":12,"avg_path_cells":8.33}},{"id":"GN-WU-0005","level":"WarmUp","puzzle_no":5,"grid":5,"pair_count":4,"pairs":[{"id":1,"start":[3,1],"end":[2,2]},{"id":2,"start":[2,1],"end":[4,4]},{"id":3,"start":[3,4],"end":[1,3]},{"id":4,"start":[1,2],"end":[0,4]}],"solution":[{"id":1,"path":[[3,1],[3,2],[3,3],[2,3],[2,2]]},{"id":2,"path":[[2,1],[2,0],[3,0],[4,0],[4,1],[4,2],[4,3],[4,4]]},{"id":3,"path":[[3,4],[2,4],[1,4],[1,3]]},{"id":4,"path":[[1,2],[1,1],[1,0],[0,0],[0,1],[0,2],[0,3],[0,4]]}],"metrics":{"solution_turns":7,"avg_path_cells":6.25}},{"id":"GN-WU-0006","level":"WarmUp","puzzle_no":6,"grid":5,"pair_count":4,"pairs":[{"id":1,"start":[4,4],"end":[3,0]},{"id":2,"start":[3,1],"end":[2,4]},{"id":3,"start":[2,3],"end":[0,3]},{"id":4,"start":[0,2],"end":[2,0]}],"solution":[{"id":1,"path":[[4,4],[4,3],[4,2],[4,1],[4,0],[3,0]]},{"id":2,"path":[[3,1],[3,2],[3,3],[3,4],[2,4]]},{"id":3,"path":[[2,3],[1,3],[1,4],[0,4],[0,3]]},{"id":4,"path":[[0,2],[1,2],[2,2],[2,1],[1,1],[0,1],[0,0],[1,0],[2,0]]}],"metrics":{"solution_turns":9,"avg_path_cells":6.25}},{"id":"GN-WU-0007","level":"WarmUp","puzzle_no":7,"grid":5,"pair_count":4,"pairs":[{"id":1,"start":[2,2],"end":[3,1]},{"id":2,"start":[4,1],"end":[1,0]},{"id":3,"start":[0,0],"end":[3,3]},{"id":4,"start":[3,2],"end":[2,4]}],"solution":[{"id":1,"path":[[2,2],[1,2],[1,1],[2,1],[3,1]]},{"id":2,"path":[[4,1],[4,0],[3,0],[2,0],[1,0]]},{"id":3,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3],[2,3],[3,3]]},{"id":4,"path":[[3,2],[4,2],[4,3],[4,4],[3,4],[2,4]]}],"metrics":{"solution_turns":8,"avg_path_cells":6.25}},{"id":"GN-WU-0008","level":"WarmUp","puzzle_no":8,"grid":5,"pair_count":4,"pairs":[{"id":1,"start":[2,4],"end":[4,1]},{"id":2,"start":[4,0],"end":[2,0]},{"id":3,"start":[1,0],"end":[0,4]},{"id":4,"start":[1,4],"end":[1,1]}],"solution":[{"id":1,"path":[[2,4],[3,4],[4,4],[4,3],[4,2],[4,1]]},{"id":2,"path":[[4,0],[3,0],[3,1],[2,1],[2,0]]},{"id":3,"path":[[1,0],[0,0],[0,1],[0,2],[0,3],[0,4]]},{"id":4,"path":[[1,4],[1,3],[2,3],[3,3],[3,2],[2,2],[1,2],[1,1]]}],"metrics":{"solution_turns":9,"avg_path_cells":6.25}}],"Beginner":[{"id":"GN-BG-0001","level":"Beginner","puzzle_no":1,"grid":6,"pair_count":4,"pairs":[{"id":1,"start":[2,5],"end":[4,3]},{"id":2,"start":[3,3],"end":[1,5]},{"id":3,"start":[0,5],"end":[2,0]},{"id":4,"start":[3,0],"end":[5,3]}],"solution":[{"id":1,"path":[[2,5],[3,5],[4,5],[5,5],[5,4],[4,4],[4,3]]},{"id":2,"path":[[3,3],[3,4],[2,4],[2,3],[1,3],[1,4],[1,5]]},{"id":3,"path":[[0,5],[0,4],[0,3],[0,2],[1,2],[1,1],[0,1],[0,0],[1,0],[2,0]]},{"id":4,"path":[[3,0],[3,1],[2,1],[2,2],[3,2],[4,2],[4,1],[4,0],[5,0],[5,1],[5,2],[5,3]]}],"metrics":{"solution_turns":18,"avg_path_cells":9}},{"id":"GN-BG-0002","level":"Beginner","puzzle_no":2,"grid":6,"pair_count":4,"pairs":[{"id":1,"start":[5,5],"end":[5,1]},{"id":2,"start":[5,0],"end":[4,2]},{"id":3,"start":[4,3],"end":[0,4]},{"id":4,"start":[0,3],"end":[3,0]}],"solution":[{"id":1,"path":[[5,5],[4,5],[4,4],[5,4],[5,3],[5,2],[5,1]]},{"id":2,"path":[[5,0],[4,0],[4,1],[3,1],[3,2],[4,2]]},{"id":3,"path":[[4,3],[3,3],[3,4],[3,5],[2,5],[2,4],[2,3],[1,3],[1,4],[1,5],[0,5],[0,4]]},{"id":4,"path":[[0,3],[0,2],[1,2],[2,2],[2,1],[1,1],[0,1],[0,0],[1,0],[2,0],[3,0]]}],"metrics":{"solution_turns":19,"avg_path_cells":9}},{"id":"GN-BG-0003","level":"Beginner","puzzle_no":3,"grid":6,"pair_count":4,"pairs":[{"id":1,"start":[0,4],"end":[3,3]},{"id":2,"start":[4,3],"end":[5,1]},{"id":3,"start":[5,0],"end":[2,0]},{"id":4,"start":[1,0],"end":[1,4]}],"solution":[{"id":1,"path":[[0,4],[0,5],[1,5],[2,5],[3,5],[4,5],[5,5],[5,4],[4,4],[3,4],[2,4],[2,3],[3,3]]},{"id":2,"path":[[4,3],[5,3],[5,2],[4,2],[4,1],[5,1]]},{"id":3,"path":[[5,0],[4,0],[3,0],[3,1],[3,2],[2,2],[2,1],[2,0]]},{"id":4,"path":[[1,0],[0,0],[0,1],[1,1],[1,2],[0,2],[0,3],[1,3],[1,4]]}],"metrics":{"solution_turns":19,"avg_path_cells":9}},{"id":"GN-BG-0004","level":"Beginner","puzzle_no":4,"grid":6,"pair_count":4,"pairs":[{"id":1,"start":[4,4],"end":[5,5]},{"id":2,"start":[5,4],"end":[5,1]},{"id":3,"start":[5,0],"end":[0,1]},{"id":4,"start":[0,2],"end":[2,3]}],"solution":[{"id":1,"path":[[4,4],[3,4],[2,4],[2,5],[3,5],[4,5],[5,5]]},{"id":2,"path":[[5,4],[5,3],[4,3],[3,3],[3,2],[3,1],[4,1],[4,2],[5,2],[5,1]]},{"id":3,"path":[[5,0],[4,0],[3,0],[2,0],[2,1],[1,1],[1,0],[0,0],[0,1]]},{"id":4,"path":[[0,2],[0,3],[0,4],[0,5],[1,5],[1,4],[1,3],[1,2],[2,2],[2,3]]}],"metrics":{"solution_turns":17,"avg_path_cells":9}},{"id":"GN-BG-0005","level":"Beginner","puzzle_no":5,"grid":6,"pair_count":4,"pairs":[{"id":1,"start":[4,2],"end":[5,0]},{"id":2,"start":[4,0],"end":[0,0]},{"id":3,"start":[0,1],"end":[3,5]},{"id":4,"start":[2,5],"end":[0,3]}],"solution":[{"id":1,"path":[[4,2],[4,3],[4,4],[4,5],[5,5],[5,4],[5,3],[5,2],[5,1],[5,0]]},{"id":2,"path":[[4,0],[4,1],[3,1],[3,0],[2,0],[2,1],[1,1],[1,0],[0,0]]},{"id":3,"path":[[0,1],[0,2],[1,2],[2,2],[3,2],[3,3],[2,3],[2,4],[3,4],[3,5]]},{"id":4,"path":[[2,5],[1,5],[0,5],[0,4],[1,4],[1,3],[0,3]]}],"metrics":{"solution_turns":19,"avg_path_cells":9}},{"id":"GN-BG-0006","level":"Beginner","puzzle_no":6,"grid":6,"pair_count":4,"pairs":[{"id":1,"start":[2,2],"end":[4,0]},{"id":2,"start":[5,0],"end":[2,4]},{"id":3,"start":[1,4],"end":[0,2]},{"id":4,"start":[0,1],"end":[3,4]}],"solution":[{"id":1,"path":[[2,2],[3,2],[4,2],[4,1],[3,1],[2,1],[2,0],[3,0],[4,0]]},{"id":2,"path":[[5,0],[5,1],[5,2],[5,3],[4,3],[4,4],[5,4],[5,5],[4,5],[3,5],[2,5],[2,4]]},{"id":3,"path":[[1,4],[1,5],[0,5],[0,4],[0,3],[0,2]]},{"id":4,"path":[[0,1],[0,0],[1,0],[1,1],[1,2],[1,3],[2,3],[3,3],[3,4]]}],"metrics":{"solution_turns":16,"avg_path_cells":9}},{"id":"GN-BG-0007","level":"Beginner","puzzle_no":7,"grid":6,"pair_count":4,"pairs":[{"id":1,"start":[5,0],"end":[1,2]},{"id":2,"start":[1,1],"end":[1,4]},{"id":3,"start":[1,3],"end":[5,4]},{"id":4,"start":[5,3],"end":[4,4]}],"solution":[{"id":1,"path":[[5,0],[4,0],[3,0],[2,0],[1,0],[0,0],[0,1],[0,2],[1,2]]},{"id":2,"path":[[1,1],[2,1],[3,1],[3,2],[2,2],[2,3],[3,3],[3,4],[2,4],[1,4]]},{"id":3,"path":[[1,3],[0,3],[0,4],[0,5],[1,5],[2,5],[3,5],[4,5],[5,5],[5,4]]},{"id":4,"path":[[5,3],[5,2],[5,1],[4,1],[4,2],[4,3],[4,4]]}],"metrics":{"solution_turns":13,"avg_path_cells":9}},{"id":"GN-BG-0008","level":"Beginner","puzzle_no":8,"grid":6,"pair_count":4,"pairs":[{"id":1,"start":[3,1],"end":[0,2]},{"id":2,"start":[1,2],"end":[0,3]},{"id":3,"start":[0,4],"end":[5,4]},{"id":4,"start":[5,3],"end":[5,0]}],"solution":[{"id":1,"path":[[3,1],[3,0],[2,0],[1,0],[0,0],[0,1],[0,2]]},{"id":2,"path":[[1,2],[1,1],[2,1],[2,2],[2,3],[1,3],[0,3]]},{"id":3,"path":[[0,4],[0,5],[1,5],[1,4],[2,4],[2,5],[3,5],[3,4],[4,4],[4,5],[5,5],[5,4]]},{"id":4,"path":[[5,3],[4,3],[3,3],[3,2],[4,2],[5,2],[5,1],[4,1],[4,0],[5,0]]}],"metrics":{"solution_turns":21,"avg_path_cells":9}}],"Easy":[{"id":"GN-EZ-0001","level":"Easy","puzzle_no":1,"grid":7,"pair_count":5,"pairs":[{"id":1,"start":[5,5],"end":[2,5]},{"id":2,"start":[1,5],"end":[3,2]},{"id":3,"start":[3,1],"end":[6,3]},{"id":4,"start":[6,4],"end":[0,6]},{"id":5,"start":[0,5],"end":[2,0]}],"solution":[{"id":1,"path":[[5,5],[5,4],[5,3],[4,3],[4,4],[4,5],[3,5],[3,4],[2,4],[2,5]]},{"id":2,"path":[[1,5],[1,4],[1,3],[1,2],[2,2],[2,3],[3,3],[3,2]]},{"id":3,"path":[[3,1],[3,0],[4,0],[5,0],[6,0],[6,1],[5,1],[4,1],[4,2],[5,2],[6,2],[6,3]]},{"id":4,"path":[[6,4],[6,5],[6,6],[5,6],[4,6],[3,6],[2,6],[1,6],[0,6]]},{"id":5,"path":[[0,5],[0,4],[0,3],[0,2],[0,1],[0,0],[1,0],[1,1],[2,1],[2,0]]}],"metrics":{"solution_turns":21,"avg_path_cells":9.8}},{"id":"GN-EZ-0002","level":"Easy","puzzle_no":2,"grid":7,"pair_count":5,"pairs":[{"id":1,"start":[5,5],"end":[5,0]},{"id":2,"start":[5,1],"end":[4,3]},{"id":3,"start":[4,2],"end":[3,5]},{"id":4,"start":[3,4],"end":[0,3]},{"id":5,"start":[1,3],"end":[0,0]}],"solution":[{"id":1,"path":[[5,5],[5,6],[6,6],[6,5],[6,4],[6,3],[6,2],[6,1],[6,0],[5,0]]},{"id":2,"path":[[5,1],[4,1],[4,0],[3,0],[3,1],[3,2],[2,2],[2,3],[3,3],[4,3]]},{"id":3,"path":[[4,2],[5,2],[5,3],[5,4],[4,4],[4,5],[4,6],[3,6],[2,6],[2,5],[3,5]]},{"id":4,"path":[[3,4],[2,4],[1,4],[1,5],[1,6],[0,6],[0,5],[0,4],[0,3]]},{"id":5,"path":[[1,3],[1,2],[0,2],[0,1],[1,1],[2,1],[2,0],[1,0],[0,0]]}],"metrics":{"solution_turns":23,"avg_path_cells":9.8}},{"id":"GN-EZ-0003","level":"Easy","puzzle_no":3,"grid":7,"pair_count":5,"pairs":[{"id":1,"start":[6,4],"end":[4,6]},{"id":2,"start":[4,5],"end":[1,6]},{"id":3,"start":[0,6],"end":[3,0]},{"id":4,"start":[4,0],"end":[3,2]},{"id":5,"start":[3,1],"end":[1,1]}],"solution":[{"id":1,"path":[[6,4],[5,4],[5,5],[6,5],[6,6],[5,6],[4,6]]},{"id":2,"path":[[4,5],[4,4],[3,4],[2,4],[2,5],[3,5],[3,6],[2,6],[1,6]]},{"id":3,"path":[[0,6],[0,5],[1,5],[1,4],[0,4],[0,3],[0,2],[0,1],[0,0],[1,0],[2,0],[3,0]]},{"id":4,"path":[[4,0],[5,0],[6,0],[6,1],[5,1],[4,1],[4,2],[5,2],[6,2],[6,3],[5,3],[4,3],[3,3],[3,2]]},{"id":5,"path":[[3,1],[2,1],[2,2],[2,3],[1,3],[1,2],[1,1]]}],"metrics":{"solution_turns":24,"avg_path_cells":9.8}},{"id":"GN-EZ-0004","level":"Easy","puzzle_no":4,"grid":7,"pair_count":5,"pairs":[{"id":1,"start":[0,2],"end":[4,6]},{"id":2,"start":[5,6],"end":[4,4]},{"id":3,"start":[5,4],"end":[1,0]},{"id":4,"start":[0,0],"end":[5,2]},{"id":5,"start":[5,3],"end":[1,5]}],"solution":[{"id":1,"path":[[0,2],[0,3],[0,4],[0,5],[0,6],[1,6],[2,6],[3,6],[4,6]]},{"id":2,"path":[[5,6],[6,6],[6,5],[5,5],[4,5],[4,4]]},{"id":3,"path":[[5,4],[6,4],[6,3],[6,2],[6,1],[6,0],[5,0],[4,0],[3,0],[2,0],[1,0]]},{"id":4,"path":[[0,0],[0,1],[1,1],[1,2],[1,3],[2,3],[2,2],[2,1],[3,1],[3,2],[4,2],[4,1],[5,1],[5,2]]},{"id":5,"path":[[5,3],[4,3],[3,3],[3,4],[3,5],[2,5],[2,4],[1,4],[1,5]]}],"metrics":{"solution_turns":21,"avg_path_cells":9.8}},{"id":"GN-EZ-0005","level":"Easy","puzzle_no":5,"grid":7,"pair_count":5,"pairs":[{"id":1,"start":[4,2],"end":[5,3]},{"id":2,"start":[5,2],"end":[6,4]},{"id":3,"start":[6,5],"end":[1,6]},{"id":4,"start":[0,6],"end":[0,1]},{"id":5,"start":[0,0],"end":[1,1]}],"solution":[{"id":1,"path":[[4,2],[4,3],[3,3],[2,3],[2,4],[1,4],[1,5],[2,5],[3,5],[3,4],[4,4],[5,4],[5,3]]},{"id":2,"path":[[5,2],[5,1],[5,0],[6,0],[6,1],[6,2],[6,3],[6,4]]},{"id":3,"path":[[6,5],[6,6],[5,6],[5,5],[4,5],[4,6],[3,6],[2,6],[1,6]]},{"id":4,"path":[[0,6],[0,5],[0,4],[0,3],[1,3],[1,2],[0,2],[0,1]]},{"id":5,"path":[[0,0],[1,0],[2,0],[3,0],[4,0],[4,1],[3,1],[3,2],[2,2],[2,1],[1,1]]}],"metrics":{"solution_turns":25,"avg_path_cells":9.8}},{"id":"GN-EZ-0006","level":"Easy","puzzle_no":6,"grid":7,"pair_count":5,"pairs":[{"id":1,"start":[4,2],"end":[1,0]},{"id":2,"start":[0,0],"end":[2,3]},{"id":3,"start":[2,4],"end":[5,1]},{"id":4,"start":[4,1],"end":[5,5]},{"id":5,"start":[5,4],"end":[1,5]}],"solution":[{"id":1,"path":[[4,2],[3,2],[2,2],[2,1],[3,1],[3,0],[2,0],[1,0]]},{"id":2,"path":[[0,0],[0,1],[1,1],[1,2],[0,2],[0,3],[0,4],[1,4],[1,3],[2,3]]},{"id":3,"path":[[2,4],[3,4],[3,3],[4,3],[5,3],[5,2],[5,1]]},{"id":4,"path":[[4,1],[4,0],[5,0],[6,0],[6,1],[6,2],[6,3],[6,4],[6,5],[6,6],[5,6],[5,5]]},{"id":5,"path":[[5,4],[4,4],[4,5],[4,6],[3,6],[3,5],[2,5],[2,6],[1,6],[0,6],[0,5],[1,5]]}],"metrics":{"solution_turns":26,"avg_path_cells":9.8}},{"id":"GN-EZ-0007","level":"Easy","puzzle_no":7,"grid":7,"pair_count":5,"pairs":[{"id":1,"start":[5,1],"end":[6,2]},{"id":2,"start":[6,1],"end":[1,1]},{"id":3,"start":[2,1],"end":[5,3]},{"id":4,"start":[6,3],"end":[4,5]},{"id":5,"start":[4,6],"end":[1,5]}],"solution":[{"id":1,"path":[[5,1],[4,1],[3,1],[3,2],[4,2],[5,2],[6,2]]},{"id":2,"path":[[6,1],[6,0],[5,0],[4,0],[3,0],[2,0],[1,0],[0,0],[0,1],[1,1]]},{"id":3,"path":[[2,1],[2,2],[1,2],[0,2],[0,3],[1,3],[2,3],[3,3],[4,3],[4,4],[5,4],[5,3]]},{"id":4,"path":[[6,3],[6,4],[6,5],[6,6],[5,6],[5,5],[4,5]]},{"id":5,"path":[[4,6],[3,6],[3,5],[3,4],[2,4],[2,5],[2,6],[1,6],[0,6],[0,5],[0,4],[1,4],[1,5]]}],"metrics":{"solution_turns":21,"avg_path_cells":9.8}},{"id":"GN-EZ-0008","level":"Easy","puzzle_no":8,"grid":7,"pair_count":5,"pairs":[{"id":1,"start":[2,2],"end":[4,1]},{"id":2,"start":[3,1],"end":[2,6]},{"id":3,"start":[1,6],"end":[2,0]},{"id":4,"start":[3,0],"end":[5,5]},{"id":5,"start":[5,4],"end":[3,3]}],"solution":[{"id":1,"path":[[2,2],[3,2],[4,2],[4,3],[5,3],[5,2],[5,1],[4,1]]},{"id":2,"path":[[3,1],[2,1],[1,1],[1,2],[1,3],[2,3],[2,4],[2,5],[2,6]]},{"id":3,"path":[[1,6],[0,6],[0,5],[1,5],[1,4],[0,4],[0,3],[0,2],[0,1],[0,0],[1,0],[2,0]]},{"id":4,"path":[[3,0],[4,0],[5,0],[6,0],[6,1],[6,2],[6,3],[6,4],[6,5],[6,6],[5,6],[5,5]]},{"id":5,"path":[[5,4],[4,4],[4,5],[4,6],[3,6],[3,5],[3,4],[3,3]]}],"metrics":{"solution_turns":19,"avg_path_cells":9.8}}],"Medium":[{"id":"GN-MD-0001","level":"Medium","puzzle_no":1,"grid":8,"pair_count":6,"pairs":[{"id":1,"start":[4,0],"end":[5,2]},{"id":2,"start":[5,3],"end":[6,6]},{"id":3,"start":[7,6],"end":[0,7]},{"id":4,"start":[0,6],"end":[1,1]},{"id":5,"start":[0,1],"end":[3,3]},{"id":6,"start":[4,3],"end":[2,3]}],"solution":[{"id":1,"path":[[4,0],[5,0],[6,0],[7,0],[7,1],[7,2],[7,3],[6,3],[6,2],[6,1],[5,1],[5,2]]},{"id":2,"path":[[5,3],[5,4],[6,4],[7,4],[7,5],[6,5],[5,5],[5,6],[6,6]]},{"id":3,"path":[[7,6],[7,7],[6,7],[5,7],[4,7],[3,7],[2,7],[1,7],[0,7]]},{"id":4,"path":[[0,6],[0,5],[0,4],[0,3],[0,2],[1,2],[2,2],[2,1],[1,1]]},{"id":5,"path":[[0,1],[0,0],[1,0],[2,0],[3,0],[3,1],[4,1],[4,2],[3,2],[3,3]]},{"id":6,"path":[[4,3],[4,4],[4,5],[4,6],[3,6],[3,5],[3,4],[2,4],[2,5],[2,6],[1,6],[1,5],[1,4],[1,3],[2,3]]}],"metrics":{"solution_turns":27,"avg_path_cells":10.67}},{"id":"GN-MD-0002","level":"Medium","puzzle_no":2,"grid":8,"pair_count":6,"pairs":[{"id":1,"start":[4,4],"end":[1,4]},{"id":2,"start":[0,4],"end":[3,5]},{"id":3,"start":[4,5],"end":[6,4]},{"id":4,"start":[5,4],"end":[4,1]},{"id":5,"start":[5,1],"end":[1,3]},{"id":6,"start":[0,3],"end":[2,1]}],"solution":[{"id":1,"path":[[4,4],[4,3],[3,3],[3,4],[2,4],[2,5],[2,6],[1,6],[1,5],[1,4]]},{"id":2,"path":[[0,4],[0,5],[0,6],[0,7],[1,7],[2,7],[3,7],[4,7],[4,6],[3,6],[3,5]]},{"id":3,"path":[[4,5],[5,5],[6,5],[6,6],[5,6],[5,7],[6,7],[7,7],[7,6],[7,5],[7,4],[6,4]]},{"id":4,"path":[[5,4],[5,3],[6,3],[7,3],[7,2],[7,1],[7,0],[6,0],[5,0],[4,0],[4,1]]},{"id":5,"path":[[5,1],[6,1],[6,2],[5,2],[4,2],[3,2],[2,2],[2,3],[1,3]]},{"id":6,"path":[[0,3],[0,2],[1,2],[1,1],[0,1],[0,0],[1,0],[2,0],[3,0],[3,1],[2,1]]}],"metrics":{"solution_turns":31,"avg_path_cells":10.67}},{"id":"GN-MD-0003","level":"Medium","puzzle_no":3,"grid":8,"pair_count":6,"pairs":[{"id":1,"start":[4,2],"end":[7,1]},{"id":2,"start":[7,0],"end":[0,0]},{"id":3,"start":[0,1],"end":[0,4]},{"id":4,"start":[0,5],"end":[4,4]},{"id":5,"start":[5,4],"end":[4,5]},{"id":6,"start":[4,6],"end":[6,7]}],"solution":[{"id":1,"path":[[4,2],[5,2],[5,3],[4,3],[3,3],[3,2],[3,1],[4,1],[5,1],[6,1],[6,2],[7,2],[7,1]]},{"id":2,"path":[[7,0],[6,0],[5,0],[4,0],[3,0],[2,0],[1,0],[0,0]]},{"id":3,"path":[[0,1],[0,2],[0,3],[1,3],[1,2],[1,1],[2,1],[2,2],[2,3],[2,4],[1,4],[0,4]]},{"id":4,"path":[[0,5],[1,5],[1,6],[0,6],[0,7],[1,7],[2,7],[3,7],[3,6],[2,6],[2,5],[3,5],[3,4],[4,4]]},{"id":5,"path":[[5,4],[6,4],[6,3],[7,3],[7,4],[7,5],[6,5],[5,5],[4,5]]},{"id":6,"path":[[4,6],[4,7],[5,7],[5,6],[6,6],[7,6],[7,7],[6,7]]}],"metrics":{"solution_turns":31,"avg_path_cells":10.67}},{"id":"GN-MD-0004","level":"Medium","puzzle_no":4,"grid":8,"pair_count":6,"pairs":[{"id":1,"start":[3,3],"end":[1,3]},{"id":2,"start":[0,3],"end":[1,0]},{"id":3,"start":[2,0],"end":[5,1]},{"id":4,"start":[5,0],"end":[6,4]},{"id":5,"start":[5,4],"end":[1,6]},{"id":6,"start":[2,6],"end":[6,1]}],"solution":[{"id":1,"path":[[3,3],[3,4],[3,5],[2,5],[1,5],[0,5],[0,4],[1,4],[2,4],[2,3],[1,3]]},{"id":2,"path":[[0,3],[0,2],[1,2],[1,1],[0,1],[0,0],[1,0]]},{"id":3,"path":[[2,0],[2,1],[2,2],[3,2],[3,1],[3,0],[4,0],[4,1],[5,1]]},{"id":4,"path":[[5,0],[6,0],[7,0],[7,1],[7,2],[7,3],[7,4],[7,5],[7,6],[7,7],[6,7],[6,6],[6,5],[6,4]]},{"id":5,"path":[[5,4],[5,5],[5,6],[5,7],[4,7],[3,7],[2,7],[1,7],[0,7],[0,6],[1,6]]},{"id":6,"path":[[2,6],[3,6],[4,6],[4,5],[4,4],[4,3],[4,2],[5,2],[5,3],[6,3],[6,2],[6,1]]}],"metrics":{"solution_turns":26,"avg_path_cells":10.67}},{"id":"GN-MD-0005","level":"Medium","puzzle_no":5,"grid":8,"pair_count":6,"pairs":[{"id":1,"start":[7,5],"end":[6,7]},{"id":2,"start":[5,7],"end":[6,3]},{"id":3,"start":[7,3],"end":[6,0]},{"id":4,"start":[5,0],"end":[5,2]},{"id":5,"start":[4,2],"end":[2,4]},{"id":6,"start":[2,5],"end":[4,7]}],"solution":[{"id":1,"path":[[7,5],[7,4],[6,4],[6,5],[6,6],[7,6],[7,7],[6,7]]},{"id":2,"path":[[5,7],[5,6],[4,6],[4,5],[5,5],[5,4],[5,3],[6,3]]},{"id":3,"path":[[7,3],[7,2],[6,2],[6,1],[7,1],[7,0],[6,0]]},{"id":4,"path":[[5,0],[4,0],[3,0],[2,0],[1,0],[0,0],[0,1],[0,2],[1,2],[1,1],[2,1],[2,2],[3,2],[3,1],[4,1],[5,1],[5,2]]},{"id":5,"path":[[4,2],[4,3],[4,4],[3,4],[3,3],[2,3],[1,3],[0,3],[0,4],[1,4],[2,4]]},{"id":6,"path":[[2,5],[3,5],[3,6],[2,6],[1,6],[1,5],[0,5],[0,6],[0,7],[1,7],[2,7],[3,7],[4,7]]}],"metrics":{"solution_turns":35,"avg_path_cells":10.67}},{"id":"GN-MD-0006","level":"Medium","puzzle_no":6,"grid":8,"pair_count":6,"pairs":[{"id":1,"start":[3,0],"end":[1,1]},{"id":2,"start":[2,1],"end":[6,0]},{"id":3,"start":[7,0],"end":[4,3]},{"id":4,"start":[4,2],"end":[3,6]},{"id":5,"start":[2,6],"end":[4,6]},{"id":6,"start":[5,6],"end":[7,5]}],"solution":[{"id":1,"path":[[3,0],[2,0],[1,0],[0,0],[0,1],[0,2],[0,3],[1,3],[2,3],[2,2],[1,2],[1,1]]},{"id":2,"path":[[2,1],[3,1],[4,1],[4,0],[5,0],[5,1],[5,2],[6,2],[6,1],[6,0]]},{"id":3,"path":[[7,0],[7,1],[7,2],[7,3],[7,4],[6,4],[6,3],[5,3],[4,3]]},{"id":4,"path":[[4,2],[3,2],[3,3],[3,4],[4,4],[5,4],[5,5],[4,5],[3,5],[3,6]]},{"id":5,"path":[[2,6],[2,5],[2,4],[1,4],[0,4],[0,5],[1,5],[1,6],[0,6],[0,7],[1,7],[2,7],[3,7],[4,7],[4,6]]},{"id":6,"path":[[5,6],[5,7],[6,7],[7,7],[7,6],[6,6],[6,5],[7,5]]}],"metrics":{"solution_turns":31,"avg_path_cells":10.67}},{"id":"GN-MD-0007","level":"Medium","puzzle_no":7,"grid":8,"pair_count":6,"pairs":[{"id":1,"start":[6,4],"end":[2,0]},{"id":2,"start":[2,1],"end":[4,4]},{"id":3,"start":[3,4],"end":[5,7]},{"id":4,"start":[4,7],"end":[0,7]},{"id":5,"start":[0,6],"end":[0,2]},{"id":6,"start":[0,1],"end":[4,3]}],"solution":[{"id":1,"path":[[6,4],[7,4],[7,3],[7,2],[7,1],[7,0],[6,0],[5,0],[4,0],[4,1],[3,1],[3,0],[2,0]]},{"id":2,"path":[[2,1],[2,2],[3,2],[4,2],[5,2],[5,1],[6,1],[6,2],[6,3],[5,3],[5,4],[4,4]]},{"id":3,"path":[[3,4],[3,5],[4,5],[5,5],[5,6],[6,6],[6,5],[7,5],[7,6],[7,7],[6,7],[5,7]]},{"id":4,"path":[[4,7],[4,6],[3,6],[3,7],[2,7],[2,6],[2,5],[1,5],[1,6],[1,7],[0,7]]},{"id":5,"path":[[0,6],[0,5],[0,4],[0,3],[0,2]]},{"id":6,"path":[[0,1],[0,0],[1,0],[1,1],[1,2],[1,3],[1,4],[2,4],[2,3],[3,3],[4,3]]}],"metrics":{"solution_turns":32,"avg_path_cells":10.67}},{"id":"GN-MD-0008","level":"Medium","puzzle_no":8,"grid":8,"pair_count":6,"pairs":[{"id":1,"start":[4,6],"end":[2,6]},{"id":2,"start":[3,6],"end":[0,2]},{"id":3,"start":[0,1],"end":[3,0]},{"id":4,"start":[4,0],"end":[4,2]},{"id":5,"start":[4,1],"end":[7,3]},{"id":6,"start":[7,4],"end":[3,4]}],"solution":[{"id":1,"path":[[4,6],[4,5],[5,5],[5,6],[5,7],[4,7],[3,7],[2,7],[1,7],[0,7],[0,6],[1,6],[2,6]]},{"id":2,"path":[[3,6],[3,5],[2,5],[1,5],[0,5],[0,4],[0,3],[0,2]]},{"id":3,"path":[[0,1],[0,0],[1,0],[1,1],[2,1],[2,0],[3,0]]},{"id":4,"path":[[4,0],[5,0],[6,0],[7,0],[7,1],[7,2],[6,2],[6,1],[5,1],[5,2],[4,2]]},{"id":5,"path":[[4,1],[3,1],[3,2],[2,2],[1,2],[1,3],[1,4],[2,4],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3]]},{"id":6,"path":[[7,4],[7,5],[7,6],[7,7],[6,7],[6,6],[6,5],[6,4],[5,4],[4,4],[3,4]]}],"metrics":{"solution_turns":27,"avg_path_cells":10.67}}],"Hard":[{"id":"GN-HD-0001","level":"Hard","puzzle_no":1,"grid":9,"pair_count":7,"pairs":[{"id":1,"start":[5,5],"end":[8,7]},{"id":2,"start":[8,6],"end":[7,3]},{"id":3,"start":[8,3],"end":[3,8]},{"id":4,"start":[2,8],"end":[6,1]},{"id":5,"start":[7,1],"end":[3,0]},{"id":6,"start":[3,1],"end":[1,6]},{"id":7,"start":[1,7],"end":[0,0]}],"solution":[{"id":1,"path":[[5,5],[5,6],[6,6],[7,6],[7,7],[6,7],[5,7],[5,8],[6,8],[7,8],[8,8],[8,7]]},{"id":2,"path":[[8,6],[8,5],[8,4],[7,4],[7,5],[6,5],[6,4],[6,3],[7,3]]},{"id":3,"path":[[8,3],[8,2],[7,2],[6,2],[5,2],[5,3],[5,4],[4,4],[4,5],[4,6],[3,6],[3,7],[4,7],[4,8],[3,8]]},{"id":4,"path":[[2,8],[2,7],[2,6],[2,5],[3,5],[3,4],[2,4],[2,3],[2,2],[3,2],[3,3],[4,3],[4,2],[4,1],[5,1],[6,1]]},{"id":5,"path":[[7,1],[8,1],[8,0],[7,0],[6,0],[5,0],[4,0],[3,0]]},{"id":6,"path":[[3,1],[2,1],[2,0],[1,0],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6]]},{"id":7,"path":[[1,7],[1,8],[0,8],[0,7],[0,6],[0,5],[0,4],[0,3],[0,2],[0,1],[0,0]]}],"metrics":{"solution_turns":36,"avg_path_cells":11.57}},{"id":"GN-HD-0002","level":"Hard","puzzle_no":2,"grid":9,"pair_count":7,"pairs":[{"id":1,"start":[7,1],"end":[8,3]},{"id":2,"start":[8,4],"end":[4,7]},{"id":3,"start":[5,7],"end":[3,7]},{"id":4,"start":[3,8],"end":[0,3]},{"id":5,"start":[0,2],"end":[3,1]},{"id":6,"start":[3,0],"end":[1,4]},{"id":7,"start":[2,4],"end":[7,5]}],"solution":[{"id":1,"path":[[7,1],[6,1],[5,1],[5,0],[6,0],[7,0],[8,0],[8,1],[8,2],[7,2],[7,3],[8,3]]},{"id":2,"path":[[8,4],[8,5],[8,6],[8,7],[8,8],[7,8],[6,8],[5,8],[4,8],[4,7]]},{"id":3,"path":[[5,7],[6,7],[7,7],[7,6],[6,6],[5,6],[4,6],[4,5],[3,5],[2,5],[1,5],[1,6],[2,6],[3,6],[3,7]]},{"id":4,"path":[[3,8],[2,8],[2,7],[1,7],[1,8],[0,8],[0,7],[0,6],[0,5],[0,4],[0,3]]},{"id":5,"path":[[0,2],[1,2],[1,1],[0,1],[0,0],[1,0],[2,0],[2,1],[3,1]]},{"id":6,"path":[[3,0],[4,0],[4,1],[4,2],[5,2],[6,2],[6,3],[5,3],[4,3],[3,3],[3,2],[2,2],[2,3],[1,3],[1,4]]},{"id":7,"path":[[2,4],[3,4],[4,4],[5,4],[5,5],[6,5],[6,4],[7,4],[7,5]]}],"metrics":{"solution_turns":40,"avg_path_cells":11.57}},{"id":"GN-HD-0003","level":"Hard","puzzle_no":3,"grid":9,"pair_count":7,"pairs":[{"id":1,"start":[8,2],"end":[6,1]},{"id":2,"start":[6,2],"end":[8,8]},{"id":3,"start":[7,8],"end":[3,7]},{"id":4,"start":[4,7],"end":[2,6]},{"id":5,"start":[1,6],"end":[0,2]},{"id":6,"start":[1,2],"end":[5,1]},{"id":7,"start":[5,0],"end":[0,0]}],"solution":[{"id":1,"path":[[8,2],[7,2],[7,1],[8,1],[8,0],[7,0],[6,0],[6,1]]},{"id":2,"path":[[6,2],[6,3],[6,4],[7,4],[7,3],[8,3],[8,4],[8,5],[7,5],[7,6],[8,6],[8,7],[8,8]]},{"id":3,"path":[[7,8],[7,7],[6,7],[6,8],[5,8],[4,8],[3,8],[2,8],[2,7],[3,7]]},{"id":4,"path":[[4,7],[5,7],[5,6],[6,6],[6,5],[5,5],[5,4],[4,4],[4,5],[4,6],[3,6],[3,5],[2,5],[2,6]]},{"id":5,"path":[[1,6],[1,7],[1,8],[0,8],[0,7],[0,6],[0,5],[1,5],[1,4],[0,4],[0,3],[0,2]]},{"id":6,"path":[[1,2],[1,3],[2,3],[2,4],[3,4],[3,3],[4,3],[5,3],[5,2],[4,2],[4,1],[5,1]]},{"id":7,"path":[[5,0],[4,0],[3,0],[3,1],[3,2],[2,2],[2,1],[2,0],[1,0],[1,1],[0,1],[0,0]]}],"metrics":{"solution_turns":51,"avg_path_cells":11.57}},{"id":"GN-HD-0004","level":"Hard","puzzle_no":4,"grid":9,"pair_count":7,"pairs":[{"id":1,"start":[5,1],"end":[7,4]},{"id":2,"start":[7,3],"end":[8,7]},{"id":3,"start":[8,8],"end":[3,6]},{"id":4,"start":[3,7],"end":[1,3]},{"id":5,"start":[2,3],"end":[1,1]},{"id":6,"start":[2,1],"end":[0,1]},{"id":7,"start":[0,2],"end":[0,8]}],"solution":[{"id":1,"path":[[5,1],[5,0],[6,0],[6,1],[6,2],[7,2],[7,1],[7,0],[8,0],[8,1],[8,2],[8,3],[8,4],[7,4]]},{"id":2,"path":[[7,3],[6,3],[6,4],[6,5],[7,5],[8,5],[8,6],[8,7]]},{"id":3,"path":[[8,8],[7,8],[7,7],[7,6],[6,6],[6,7],[6,8],[5,8],[5,7],[5,6],[4,6],[3,6]]},{"id":4,"path":[[3,7],[4,7],[4,8],[3,8],[2,8],[2,7],[2,6],[2,5],[2,4],[1,4],[1,3]]},{"id":5,"path":[[2,3],[3,3],[3,4],[3,5],[4,5],[5,5],[5,4],[4,4],[4,3],[5,3],[5,2],[4,2],[3,2],[2,2],[1,2],[1,1]]},{"id":6,"path":[[2,1],[3,1],[4,1],[4,0],[3,0],[2,0],[1,0],[0,0],[0,1]]},{"id":7,"path":[[0,2],[0,3],[0,4],[0,5],[1,5],[1,6],[0,6],[0,7],[1,7],[1,8],[0,8]]}],"metrics":{"solution_turns":40,"avg_path_cells":11.57}},{"id":"GN-HD-0005","level":"Hard","puzzle_no":5,"grid":9,"pair_count":7,"pairs":[{"id":1,"start":[1,7],"end":[4,8]},{"id":2,"start":[4,7],"end":[7,8]},{"id":3,"start":[8,8],"end":[7,0]},{"id":4,"start":[6,0],"end":[6,4]},{"id":5,"start":[6,3],"end":[2,4]},{"id":6,"start":[1,4],"end":[1,1]},{"id":7,"start":[1,2],"end":[4,2]}],"solution":[{"id":1,"path":[[1,7],[1,6],[1,5],[0,5],[0,6],[0,7],[0,8],[1,8],[2,8],[2,7],[3,7],[3,8],[4,8]]},{"id":2,"path":[[4,7],[4,6],[5,6],[6,6],[6,7],[5,7],[5,8],[6,8],[7,8]]},{"id":3,"path":[[8,8],[8,7],[7,7],[7,6],[8,6],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0],[7,0]]},{"id":4,"path":[[6,0],[5,0],[5,1],[6,1],[7,1],[7,2],[7,3],[7,4],[7,5],[6,5],[6,4]]},{"id":5,"path":[[6,3],[6,2],[5,2],[5,3],[4,3],[3,3],[3,4],[4,4],[5,4],[5,5],[4,5],[3,5],[3,6],[2,6],[2,5],[2,4]]},{"id":6,"path":[[1,4],[0,4],[0,3],[0,2],[0,1],[0,0],[1,0],[1,1]]},{"id":7,"path":[[1,2],[1,3],[2,3],[2,2],[2,1],[2,0],[3,0],[4,0],[4,1],[3,1],[3,2],[4,2]]}],"metrics":{"solution_turns":42,"avg_path_cells":11.57}},{"id":"GN-HD-0006","level":"Hard","puzzle_no":6,"grid":9,"pair_count":7,"pairs":[{"id":1,"start":[0,0],"end":[7,0]},{"id":2,"start":[8,0],"end":[0,4]},{"id":3,"start":[0,5],"end":[2,6]},{"id":4,"start":[3,6],"end":[2,8]},{"id":5,"start":[3,8],"end":[7,7]},{"id":6,"start":[6,7],"end":[7,5]},{"id":7,"start":[6,5],"end":[7,3]}],"solution":[{"id":1,"path":[[0,0],[0,1],[0,2],[1,2],[2,2],[2,1],[1,1],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0]]},{"id":2,"path":[[8,0],[8,1],[7,1],[6,1],[5,1],[5,2],[5,3],[4,3],[4,2],[4,1],[3,1],[3,2],[3,3],[2,3],[2,4],[1,4],[1,3],[0,3],[0,4]]},{"id":3,"path":[[0,5],[0,6],[0,7],[0,8],[1,8],[1,7],[1,6],[1,5],[2,5],[2,6]]},{"id":4,"path":[[3,6],[3,5],[3,4],[4,4],[4,5],[4,6],[4,7],[3,7],[2,7],[2,8]]},{"id":5,"path":[[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[8,7],[7,7]]},{"id":6,"path":[[6,7],[5,7],[5,6],[6,6],[7,6],[8,6],[8,5],[8,4],[7,4],[7,5]]},{"id":7,"path":[[6,5],[5,5],[5,4],[6,4],[6,3],[6,2],[7,2],[8,2],[8,3],[7,3]]}],"metrics":{"solution_turns":38,"avg_path_cells":11.57}},{"id":"GN-HD-0007","level":"Hard","puzzle_no":7,"grid":9,"pair_count":7,"pairs":[{"id":1,"start":[6,6],"end":[4,6]},{"id":2,"start":[4,5],"end":[3,8]},{"id":3,"start":[2,8],"end":[1,4]},{"id":4,"start":[2,4],"end":[5,3]},{"id":5,"start":[5,4],"end":[6,1]},{"id":6,"start":[5,1],"end":[3,0]},{"id":7,"start":[4,0],"end":[7,1]}],"solution":[{"id":1,"path":[[6,6],[6,7],[7,7],[8,7],[8,8],[7,8],[6,8],[5,8],[5,7],[5,6],[4,6]]},{"id":2,"path":[[4,5],[3,5],[3,6],[3,7],[4,7],[4,8],[3,8]]},{"id":3,"path":[[2,8],[2,7],[2,6],[2,5],[1,5],[1,6],[1,7],[1,8],[0,8],[0,7],[0,6],[0,5],[0,4],[0,3],[1,3],[1,4]]},{"id":4,"path":[[2,4],[2,3],[2,2],[3,2],[3,3],[3,4],[4,4],[4,3],[5,3]]},{"id":5,"path":[[5,4],[5,5],[6,5],[7,5],[7,6],[8,6],[8,5],[8,4],[7,4],[6,4],[6,3],[6,2],[6,1]]},{"id":6,"path":[[5,1],[5,2],[4,2],[4,1],[3,1],[2,1],[1,1],[1,2],[0,2],[0,1],[0,0],[1,0],[2,0],[3,0]]},{"id":7,"path":[[4,0],[5,0],[6,0],[7,0],[8,0],[8,1],[8,2],[8,3],[7,3],[7,2],[7,1]]}],"metrics":{"solution_turns":36,"avg_path_cells":11.57}},{"id":"GN-HD-0008","level":"Hard","puzzle_no":8,"grid":9,"pair_count":7,"pairs":[{"id":1,"start":[7,3],"end":[2,3]},{"id":2,"start":[2,2],"end":[4,2]},{"id":3,"start":[4,1],"end":[0,4]},{"id":4,"start":[0,5],"end":[3,7]},{"id":5,"start":[3,6],"end":[6,8]},{"id":6,"start":[7,8],"end":[4,5]},{"id":7,"start":[3,5],"end":[3,1]}],"solution":[{"id":1,"path":[[7,3],[8,3],[8,2],[8,1],[8,0],[7,0],[7,1],[7,2],[6,2],[6,3],[6,4],[5,4],[4,4],[3,4],[2,4],[2,3]]},{"id":2,"path":[[2,2],[3,2],[3,3],[4,3],[5,3],[5,2],[4,2]]},{"id":3,"path":[[4,1],[5,1],[6,1],[6,0],[5,0],[4,0],[3,0],[2,0],[1,0],[0,0],[0,1],[0,2],[0,3],[0,4]]},{"id":4,"path":[[0,5],[0,6],[0,7],[0,8],[1,8],[1,7],[1,6],[2,6],[2,7],[2,8],[3,8],[4,8],[4,7],[3,7]]},{"id":5,"path":[[3,6],[4,6],[5,6],[6,6],[6,7],[5,7],[5,8],[6,8]]},{"id":6,"path":[[7,8],[8,8],[8,7],[7,7],[7,6],[8,6],[8,5],[8,4],[7,4],[7,5],[6,5],[5,5],[4,5]]},{"id":7,"path":[[3,5],[2,5],[1,5],[1,4],[1,3],[1,2],[1,1],[2,1],[3,1]]}],"metrics":{"solution_turns":35,"avg_path_cells":11.57}}],"Expert":[{"id":"GN-EX-0001","level":"Expert","puzzle_no":1,"grid":10,"pair_count":8,"pairs":[{"id":1,"start":[6,0],"end":[9,1]},{"id":2,"start":[8,1],"end":[9,6]},{"id":3,"start":[9,7],"end":[5,9]},{"id":4,"start":[4,9],"end":[1,9]},{"id":5,"start":[0,9],"end":[0,5]},{"id":6,"start":[1,5],"end":[4,3]},{"id":7,"start":[4,4],"end":[6,4]},{"id":8,"start":[6,5],"end":[3,6]}],"solution":[{"id":1,"path":[[6,0],[5,0],[4,0],[4,1],[4,2],[5,2],[5,1],[6,1],[6,2],[7,2],[7,1],[7,0],[8,0],[9,0],[9,1]]},{"id":2,"path":[[8,1],[8,2],[9,2],[9,3],[8,3],[7,3],[7,4],[7,5],[8,5],[8,4],[9,4],[9,5],[9,6]]},{"id":3,"path":[[9,7],[9,8],[9,9],[8,9],[8,8],[8,7],[8,6],[7,6],[7,7],[6,7],[6,8],[7,8],[7,9],[6,9],[5,9]]},{"id":4,"path":[[4,9],[3,9],[2,9],[2,8],[2,7],[2,6],[1,6],[1,7],[1,8],[1,9]]},{"id":5,"path":[[0,9],[0,8],[0,7],[0,6],[0,5]]},{"id":6,"path":[[1,5],[1,4],[0,4],[0,3],[1,3],[2,3],[2,2],[1,2],[0,2],[0,1],[0,0],[1,0],[1,1],[2,1],[2,0],[3,0],[3,1],[3,2],[3,3],[4,3]]},{"id":7,"path":[[4,4],[3,4],[2,4],[2,5],[3,5],[4,5],[5,5],[5,4],[5,3],[6,3],[6,4]]},{"id":8,"path":[[6,5],[6,6],[5,6],[5,7],[5,8],[4,8],[3,8],[3,7],[4,7],[4,6],[3,6]]}],"metrics":{"solution_turns":54,"avg_path_cells":12.5}},{"id":"GN-EX-0002","level":"Expert","puzzle_no":2,"grid":10,"pair_count":8,"pairs":[{"id":1,"start":[1,8],"end":[9,7]},{"id":2,"start":[8,7],"end":[2,9]},{"id":3,"start":[1,9],"end":[0,0]},{"id":4,"start":[1,0],"end":[7,1]},{"id":5,"start":[6,1],"end":[3,3]},{"id":6,"start":[4,3],"end":[9,2]},{"id":7,"start":[9,3],"end":[3,5]},{"id":8,"start":[3,4],"end":[1,3]}],"solution":[{"id":1,"path":[[1,8],[1,7],[2,7],[2,8],[3,8],[4,8],[5,8],[6,8],[6,7],[6,6],[7,6],[8,6],[9,6],[9,7]]},{"id":2,"path":[[8,7],[7,7],[7,8],[8,8],[9,8],[9,9],[8,9],[7,9],[6,9],[5,9],[4,9],[3,9],[2,9]]},{"id":3,"path":[[1,9],[0,9],[0,8],[0,7],[0,6],[0,5],[0,4],[0,3],[0,2],[1,2],[1,1],[0,1],[0,0]]},{"id":4,"path":[[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[9,1],[8,1],[7,1]]},{"id":5,"path":[[6,1],[6,2],[5,2],[5,1],[4,1],[4,2],[3,2],[3,1],[2,1],[2,2],[2,3],[3,3]]},{"id":6,"path":[[4,3],[4,4],[5,4],[5,3],[6,3],[6,4],[7,4],[8,4],[8,3],[7,3],[7,2],[8,2],[9,2]]},{"id":7,"path":[[9,3],[9,4],[9,5],[8,5],[7,5],[6,5],[5,5],[5,6],[5,7],[4,7],[3,7],[3,6],[4,6],[4,5],[3,5]]},{"id":8,"path":[[3,4],[2,4],[2,5],[2,6],[1,6],[1,5],[1,4],[1,3]]}],"metrics":{"solution_turns":45,"avg_path_cells":12.5}},{"id":"GN-EX-0003","level":"Expert","puzzle_no":3,"grid":10,"pair_count":8,"pairs":[{"id":1,"start":[4,4],"end":[1,3]},{"id":2,"start":[1,4],"end":[0,8]},{"id":3,"start":[0,9],"end":[4,8]},{"id":4,"start":[4,9],"end":[9,4]},{"id":5,"start":[9,3],"end":[4,1]},{"id":6,"start":[5,1],"end":[6,5]},{"id":7,"start":[7,5],"end":[5,4]},{"id":8,"start":[5,5],"end":[5,8]}],"solution":[{"id":1,"path":[[4,4],[3,4],[2,4],[2,3],[3,3],[3,2],[2,2],[1,2],[0,2],[0,3],[1,3]]},{"id":2,"path":[[1,4],[0,4],[0,5],[0,6],[1,6],[1,5],[2,5],[2,6],[2,7],[1,7],[0,7],[0,8]]},{"id":3,"path":[[0,9],[1,9],[1,8],[2,8],[2,9],[3,9],[3,8],[3,7],[4,7],[4,8]]},{"id":4,"path":[[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],[9,8],[8,8],[8,7],[9,7],[9,6],[9,5],[9,4]]},{"id":5,"path":[[9,3],[9,2],[9,1],[9,0],[8,0],[7,0],[6,0],[5,0],[4,0],[3,0],[2,0],[1,0],[0,0],[0,1],[1,1],[2,1],[3,1],[4,1]]},{"id":6,"path":[[5,1],[6,1],[7,1],[8,1],[8,2],[7,2],[7,3],[8,3],[8,4],[8,5],[8,6],[7,6],[6,6],[6,5]]},{"id":7,"path":[[7,5],[7,4],[6,4],[6,3],[6,2],[5,2],[4,2],[4,3],[5,3],[5,4]]},{"id":8,"path":[[5,5],[4,5],[3,5],[3,6],[4,6],[5,6],[5,7],[6,7],[7,7],[7,8],[6,8],[5,8]]}],"metrics":{"solution_turns":47,"avg_path_cells":12.5}},{"id":"GN-EX-0004","level":"Expert","puzzle_no":4,"grid":10,"pair_count":8,"pairs":[{"id":1,"start":[1,8],"end":[0,6]},{"id":2,"start":[0,7],"end":[8,8]},{"id":3,"start":[7,8],"end":[4,5]},{"id":4,"start":[4,6],"end":[8,6]},{"id":5,"start":[8,7],"end":[3,3]},{"id":6,"start":[4,3],"end":[9,0]},{"id":7,"start":[8,0],"end":[3,0]},{"id":8,"start":[2,0],"end":[6,2]}],"solution":[{"id":1,"path":[[1,8],[1,7],[1,6],[1,5],[1,4],[1,3],[0,3],[0,4],[0,5],[0,6]]},{"id":2,"path":[[0,7],[0,8],[0,9],[1,9],[2,9],[3,9],[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],[9,8],[8,8]]},{"id":3,"path":[[7,8],[7,7],[6,7],[6,8],[5,8],[4,8],[3,8],[2,8],[2,7],[3,7],[3,6],[2,6],[2,5],[3,5],[4,5]]},{"id":4,"path":[[4,6],[4,7],[5,7],[5,6],[5,5],[6,5],[6,6],[7,6],[7,5],[8,5],[8,6]]},{"id":5,"path":[[8,7],[9,7],[9,6],[9,5],[9,4],[8,4],[7,4],[6,4],[5,4],[4,4],[3,4],[2,4],[2,3],[3,3]]},{"id":6,"path":[[4,3],[4,2],[5,2],[5,3],[6,3],[7,3],[8,3],[9,3],[9,2],[8,2],[7,2],[7,1],[8,1],[9,1],[9,0]]},{"id":7,"path":[[8,0],[7,0],[6,0],[5,0],[4,0],[3,0]]},{"id":8,"path":[[2,0],[2,1],[1,1],[1,0],[0,0],[0,1],[0,2],[1,2],[2,2],[3,2],[3,1],[4,1],[5,1],[6,1],[6,2]]}],"metrics":{"solution_turns":42,"avg_path_cells":12.5}},{"id":"GN-EX-0005","level":"Expert","puzzle_no":5,"grid":10,"pair_count":8,"pairs":[{"id":1,"start":[4,9],"end":[8,7]},{"id":2,"start":[8,8],"end":[8,4]},{"id":3,"start":[8,5],"end":[7,1]},{"id":4,"start":[7,0],"end":[0,4]},{"id":5,"start":[1,4],"end":[1,8]},{"id":6,"start":[2,8],"end":[4,1]},{"id":7,"start":[4,2],"end":[4,7]},{"id":8,"start":[4,8],"end":[5,5]}],"solution":[{"id":1,"path":[[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],[9,8],[9,7],[8,7]]},{"id":2,"path":[[8,8],[7,8],[7,7],[7,6],[8,6],[9,6],[9,5],[9,4],[8,4]]},{"id":3,"path":[[8,5],[7,5],[7,4],[7,3],[8,3],[9,3],[9,2],[9,1],[9,0],[8,0],[8,1],[8,2],[7,2],[7,1]]},{"id":4,"path":[[7,0],[6,0],[5,0],[4,0],[3,0],[2,0],[2,1],[1,1],[1,0],[0,0],[0,1],[0,2],[0,3],[0,4]]},{"id":5,"path":[[1,4],[1,5],[0,5],[0,6],[1,6],[1,7],[0,7],[0,8],[0,9],[1,9],[1,8]]},{"id":6,"path":[[2,8],[2,9],[3,9],[3,8],[3,7],[2,7],[2,6],[2,5],[2,4],[2,3],[1,3],[1,2],[2,2],[3,2],[3,1],[4,1]]},{"id":7,"path":[[4,2],[5,2],[5,1],[6,1],[6,2],[6,3],[5,3],[4,3],[3,3],[3,4],[4,4],[4,5],[3,5],[3,6],[4,6],[4,7]]},{"id":8,"path":[[4,8],[5,8],[6,8],[6,7],[5,7],[5,6],[6,6],[6,5],[6,4],[5,4],[5,5]]}],"metrics":{"solution_turns":53,"avg_path_cells":12.5}},{"id":"GN-EX-0006","level":"Expert","puzzle_no":6,"grid":10,"pair_count":8,"pairs":[{"id":1,"start":[0,3],"end":[2,5]},{"id":2,"start":[2,4],"end":[3,8]},{"id":3,"start":[2,8],"end":[5,7]},{"id":4,"start":[6,7],"end":[9,4]},{"id":5,"start":[8,4],"end":[6,4]},{"id":6,"start":[6,3],"end":[8,1]},{"id":7,"start":[8,2],"end":[6,0]},{"id":8,"start":[5,0],"end":[0,2]}],"solution":[{"id":1,"path":[[0,3],[1,3],[1,4],[0,4],[0,5],[0,6],[0,7],[1,7],[1,6],[1,5],[2,5]]},{"id":2,"path":[[2,4],[2,3],[3,3],[3,4],[3,5],[3,6],[2,6],[2,7],[3,7],[4,7],[4,8],[3,8]]},{"id":3,"path":[[2,8],[1,8],[0,8],[0,9],[1,9],[2,9],[3,9],[4,9],[5,9],[6,9],[6,8],[5,8],[5,7]]},{"id":4,"path":[[6,7],[7,7],[8,7],[8,8],[7,8],[7,9],[8,9],[9,9],[9,8],[9,7],[9,6],[8,6],[8,5],[9,5],[9,4]]},{"id":5,"path":[[8,4],[7,4],[7,5],[7,6],[6,6],[5,6],[4,6],[4,5],[4,4],[5,4],[5,5],[6,5],[6,4]]},{"id":6,"path":[[6,3],[7,3],[8,3],[9,3],[9,2],[9,1],[9,0],[8,0],[8,1]]},{"id":7,"path":[[8,2],[7,2],[6,2],[5,2],[5,3],[4,3],[4,2],[4,1],[5,1],[6,1],[7,1],[7,0],[6,0]]},{"id":8,"path":[[5,0],[4,0],[3,0],[2,0],[2,1],[3,1],[3,2],[2,2],[1,2],[1,1],[1,0],[0,0],[0,1],[0,2]]}],"metrics":{"solution_turns":50,"avg_path_cells":12.5}},{"id":"GN-EX-0007","level":"Expert","puzzle_no":7,"grid":10,"pair_count":8,"pairs":[{"id":1,"start":[1,7],"end":[0,5]},{"id":2,"start":[0,6],"end":[5,8]},{"id":3,"start":[4,8],"end":[7,5]},{"id":4,"start":[8,5],"end":[6,4]},{"id":5,"start":[6,5],"end":[4,3]},{"id":6,"start":[4,4],"end":[3,0]},{"id":7,"start":[2,0],"end":[0,4]},{"id":8,"start":[1,4],"end":[4,1]}],"solution":[{"id":1,"path":[[1,7],[1,8],[2,8],[3,8],[3,7],[2,7],[2,6],[1,6],[1,5],[0,5]]},{"id":2,"path":[[0,6],[0,7],[0,8],[0,9],[1,9],[2,9],[3,9],[4,9],[5,9],[6,9],[7,9],[7,8],[6,8],[5,8]]},{"id":3,"path":[[4,8],[4,7],[5,7],[5,6],[6,6],[6,7],[7,7],[7,6],[7,5]]},{"id":4,"path":[[8,5],[8,6],[8,7],[8,8],[8,9],[9,9],[9,8],[9,7],[9,6],[9,5],[9,4],[8,4],[7,4],[6,4]]},{"id":5,"path":[[6,5],[5,5],[4,5],[4,6],[3,6],[3,5],[2,5],[2,4],[3,4],[3,3],[4,3]]},{"id":6,"path":[[4,4],[5,4],[5,3],[6,3],[7,3],[8,3],[9,3],[9,2],[8,2],[7,2],[7,1],[8,1],[9,1],[9,0],[8,0],[7,0],[6,0],[5,0],[4,0],[3,0]]},{"id":7,"path":[[2,0],[1,0],[0,0],[0,1],[1,1],[1,2],[0,2],[0,3],[0,4]]},{"id":8,"path":[[1,4],[1,3],[2,3],[2,2],[2,1],[3,1],[3,2],[4,2],[5,2],[6,2],[6,1],[5,1],[4,1]]}],"metrics":{"solution_turns":47,"avg_path_cells":12.5}},{"id":"GN-EX-0008","level":"Expert","puzzle_no":8,"grid":10,"pair_count":8,"pairs":[{"id":1,"start":[6,4],"end":[7,8]},{"id":2,"start":[6,8],"end":[3,6]},{"id":3,"start":[3,5],"end":[1,2]},{"id":4,"start":[1,1],"end":[0,9]},{"id":5,"start":[1,9],"end":[9,9]},{"id":6,"start":[9,8],"end":[8,3]},{"id":7,"start":[8,4],"end":[7,0]},{"id":8,"start":[6,0],"end":[2,1]}],"solution":[{"id":1,"path":[[6,4],[6,5],[5,5],[5,4],[4,4],[4,5],[4,6],[5,6],[6,6],[6,7],[7,7],[7,8]]},{"id":2,"path":[[6,8],[5,8],[5,7],[4,7],[4,8],[3,8],[3,7],[3,6]]},{"id":3,"path":[[3,5],[2,5],[2,6],[1,6],[1,5],[1,4],[2,4],[3,4],[3,3],[4,3],[4,2],[3,2],[2,2],[2,3],[1,3],[1,2]]},{"id":4,"path":[[1,1],[1,0],[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9]]},{"id":5,"path":[[1,9],[1,8],[1,7],[2,7],[2,8],[2,9],[3,9],[4,9],[5,9],[6,9],[7,9],[8,9],[9,9]]},{"id":6,"path":[[9,8],[8,8],[8,7],[9,7],[9,6],[8,6],[7,6],[7,5],[8,5],[9,5],[9,4],[9,3],[9,2],[8,2],[8,3]]},{"id":7,"path":[[8,4],[7,4],[7,3],[7,2],[7,1],[8,1],[9,1],[9,0],[8,0],[7,0]]},{"id":8,"path":[[6,0],[6,1],[6,2],[6,3],[5,3],[5,2],[5,1],[5,0],[4,0],[4,1],[3,1],[3,0],[2,0],[2,1]]}],"metrics":{"solution_turns":50,"avg_path_cells":12.5}}],"Master":[{"id":"GN-MS-0001","level":"Master","puzzle_no":1,"grid":12,"pair_count":9,"pairs":[{"id":1,"start":[9,1],"end":[2,2]},{"id":2,"start":[2,3],"end":[6,4]},{"id":3,"start":[7,4],"end":[10,6]},{"id":4,"start":[11,6],"end":[11,10]},{"id":5,"start":[11,11],"end":[4,6]},{"id":6,"start":[5,6],"end":[0,0]},{"id":7,"start":[0,1],"end":[2,10]},{"id":8,"start":[3,10],"end":[6,10]},{"id":9,"start":[7,10],"end":[0,11]}],"solution":[{"id":1,"path":[[9,1],[9,2],[9,3],[10,3],[11,3],[11,2],[10,2],[10,1],[11,1],[11,0],[10,0],[9,0],[8,0],[7,0],[6,0],[5,0],[4,0],[3,0],[2,0],[2,1],[2,2]]},{"id":2,"path":[[2,3],[2,4],[3,4],[3,3],[3,2],[3,1],[4,1],[5,1],[5,2],[4,2],[4,3],[5,3],[6,3],[6,4]]},{"id":3,"path":[[7,4],[7,3],[7,2],[6,2],[6,1],[7,1],[8,1],[8,2],[8,3],[8,4],[9,4],[10,4],[11,4],[11,5],[10,5],[10,6]]},{"id":4,"path":[[11,6],[11,7],[10,7],[9,7],[9,6],[9,5],[8,5],[7,5],[7,6],[8,6],[8,7],[8,8],[9,8],[10,8],[11,8],[11,9],[11,10]]},{"id":5,"path":[[11,11],[10,11],[10,10],[10,9],[9,9],[9,10],[9,11],[8,11],[8,10],[8,9],[7,9],[7,8],[7,7],[6,7],[5,7],[4,7],[3,7],[3,6],[4,6]]},{"id":6,"path":[[5,6],[6,6],[6,5],[5,5],[5,4],[4,4],[4,5],[3,5],[2,5],[1,5],[1,4],[1,3],[1,2],[1,1],[1,0],[0,0]]},{"id":7,"path":[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],[0,10],[1,10],[2,10]]},{"id":8,"path":[[3,10],[3,9],[2,9],[1,9],[1,8],[1,7],[1,6],[2,6],[2,7],[2,8],[3,8],[4,8],[5,8],[6,8],[6,9],[5,9],[4,9],[4,10],[5,10],[6,10]]},{"id":9,"path":[[7,10],[7,11],[6,11],[5,11],[4,11],[3,11],[2,11],[1,11],[0,11]]}],"metrics":{"solution_turns":61,"avg_path_cells":16}},{"id":"GN-MS-0002","level":"Master","puzzle_no":2,"grid":12,"pair_count":9,"pairs":[{"id":1,"start":[9,9],"end":[6,10]},{"id":2,"start":[6,9],"end":[3,11]},{"id":3,"start":[2,11],"end":[0,2]},{"id":4,"start":[0,1],"end":[3,5]},{"id":5,"start":[4,5],"end":[5,6]},{"id":6,"start":[4,6],"end":[8,8]},{"id":7,"start":[8,7],"end":[4,1]},{"id":8,"start":[4,0],"end":[9,1]},{"id":9,"start":[9,2],"end":[9,6]}],"solution":[{"id":1,"path":[[9,9],[8,9],[7,9],[7,10],[8,10],[9,10],[10,10],[10,9],[11,9],[11,10],[11,11],[10,11],[9,11],[8,11],[7,11],[6,11],[5,11],[5,10],[6,10]]},{"id":2,"path":[[6,9],[5,9],[4,9],[3,9],[2,9],[2,8],[1,8],[1,9],[1,10],[2,10],[3,10],[4,10],[4,11],[3,11]]},{"id":3,"path":[[2,11],[1,11],[0,11],[0,10],[0,9],[0,8],[0,7],[1,7],[1,6],[0,6],[0,5],[0,4],[0,3],[0,2]]},{"id":4,"path":[[0,1],[0,0],[1,0],[2,0],[3,0],[3,1],[2,1],[1,1],[1,2],[2,2],[3,2],[3,3],[3,4],[2,4],[2,3],[1,3],[1,4],[1,5],[2,5],[3,5]]},{"id":5,"path":[[4,5],[4,4],[4,3],[4,2],[5,2],[5,3],[6,3],[7,3],[7,4],[6,4],[5,4],[5,5],[5,6]]},{"id":6,"path":[[4,6],[3,6],[2,6],[2,7],[3,7],[3,8],[4,8],[4,7],[5,7],[5,8],[6,8],[6,7],[7,7],[7,8],[8,8]]},{"id":7,"path":[[8,7],[8,6],[7,6],[6,6],[6,5],[7,5],[8,5],[8,4],[8,3],[8,2],[8,1],[7,1],[7,2],[6,2],[6,1],[5,1],[4,1]]},{"id":8,"path":[[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[11,1],[11,2],[11,3],[11,4],[10,4],[10,3],[10,2],[10,1],[9,1]]},{"id":9,"path":[[9,2],[9,3],[9,4],[9,5],[10,5],[11,5],[11,6],[10,6],[10,7],[11,7],[11,8],[10,8],[9,8],[9,7],[9,6]]}],"metrics":{"solution_turns":69,"avg_path_cells":16}},{"id":"GN-MS-0003","level":"Master","puzzle_no":3,"grid":12,"pair_count":9,"pairs":[{"id":1,"start":[2,0],"end":[1,5]},{"id":2,"start":[0,5],"end":[4,0]},{"id":3,"start":[5,0],"end":[8,2]},{"id":4,"start":[9,2],"end":[5,4]},{"id":5,"start":[5,5],"end":[8,6]},{"id":6,"start":[8,7],"end":[11,7]},{"id":7,"start":[11,8],"end":[8,8]},{"id":8,"start":[7,8],"end":[4,7]},{"id":9,"start":[3,7],"end":[2,11]}],"solution":[{"id":1,"path":[[2,0],[2,1],[1,1],[1,0],[0,0],[0,1],[0,2],[1,2],[2,2],[2,3],[1,3],[0,3],[0,4],[1,4],[2,4],[3,4],[3,5],[2,5],[1,5]]},{"id":2,"path":[[0,5],[0,6],[0,7],[1,7],[1,6],[2,6],[3,6],[4,6],[4,5],[4,4],[4,3],[3,3],[3,2],[4,2],[4,1],[3,1],[3,0],[4,0]]},{"id":3,"path":[[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],[11,0],[11,1],[10,1],[10,2],[11,2],[11,3],[10,3],[9,3],[9,4],[8,4],[8,3],[8,2]]},{"id":4,"path":[[9,2],[9,1],[8,1],[7,1],[7,2],[6,2],[6,1],[5,1],[5,2],[5,3],[6,3],[7,3],[7,4],[6,4],[5,4]]},{"id":5,"path":[[5,5],[6,5],[6,6],[5,6],[5,7],[5,8],[6,8],[6,7],[7,7],[7,6],[7,5],[8,5],[8,6]]},{"id":6,"path":[[8,7],[9,7],[10,7],[10,6],[9,6],[9,5],[10,5],[10,4],[11,4],[11,5],[11,6],[11,7]]},{"id":7,"path":[[11,8],[10,8],[10,9],[11,9],[11,10],[11,11],[10,11],[10,10],[9,10],[9,11],[8,11],[8,10],[8,9],[9,9],[9,8],[8,8]]},{"id":8,"path":[[7,8],[7,9],[6,9],[6,10],[7,10],[7,11],[6,11],[5,11],[4,11],[3,11],[3,10],[4,10],[5,10],[5,9],[4,9],[3,9],[3,8],[4,8],[4,7]]},{"id":9,"path":[[3,7],[2,7],[2,8],[2,9],[1,9],[1,8],[0,8],[0,9],[0,10],[0,11],[1,11],[1,10],[2,10],[2,11]]}],"metrics":{"solution_turns":89,"avg_path_cells":16}},{"id":"GN-MS-0004","level":"Master","puzzle_no":4,"grid":12,"pair_count":9,"pairs":[{"id":1,"start":[8,10],"end":[6,11]},{"id":2,"start":[5,11],"end":[3,8]},{"id":3,"start":[3,7],"end":[8,4]},{"id":4,"start":[8,5],"end":[11,9]},{"id":5,"start":[11,8],"end":[11,6]},{"id":6,"start":[11,5],"end":[8,3]},{"id":7,"start":[7,3],"end":[3,4]},{"id":8,"start":[3,3],"end":[1,2]},{"id":9,"start":[2,2],"end":[0,9]}],"solution":[{"id":1,"path":[[8,10],[7,10],[7,11],[8,11],[9,11],[10,11],[11,11],[11,10],[10,10],[9,10],[9,9],[8,9],[7,9],[6,9],[6,10],[6,11]]},{"id":2,"path":[[5,11],[5,10],[5,9],[4,9],[4,10],[4,11],[3,11],[3,10],[3,9],[2,9],[2,10],[2,11],[1,11],[0,11],[0,10],[1,10],[1,9],[1,8],[1,7],[2,7],[2,8],[3,8]]},{"id":3,"path":[[3,7],[4,7],[4,8],[5,8],[5,7],[5,6],[4,6],[4,5],[5,5],[5,4],[5,3],[6,3],[6,4],[6,5],[7,5],[7,4],[8,4]]},{"id":4,"path":[[8,5],[8,6],[7,6],[6,6],[6,7],[6,8],[7,8],[7,7],[8,7],[8,8],[9,8],[10,8],[10,9],[11,9]]},{"id":5,"path":[[11,8],[11,7],[10,7],[9,7],[9,6],[9,5],[9,4],[10,4],[10,5],[10,6],[11,6]]},{"id":6,"path":[[11,5],[11,4],[11,3],[10,3],[9,3],[9,2],[10,2],[11,2],[11,1],[11,0],[10,0],[10,1],[9,1],[9,0],[8,0],[8,1],[8,2],[8,3]]},{"id":7,"path":[[7,3],[7,2],[7,1],[7,0],[6,0],[5,0],[5,1],[6,1],[6,2],[5,2],[4,2],[4,3],[4,4],[3,4]]},{"id":8,"path":[[3,3],[3,2],[3,1],[4,1],[4,0],[3,0],[2,0],[2,1],[1,1],[1,0],[0,0],[0,1],[0,2],[1,2]]},{"id":9,"path":[[2,2],[2,3],[2,4],[1,4],[1,3],[0,3],[0,4],[0,5],[1,5],[2,5],[3,5],[3,6],[2,6],[1,6],[0,6],[0,7],[0,8],[0,9]]}],"metrics":{"solution_turns":80,"avg_path_cells":16}},{"id":"GN-MS-0005","level":"Master","puzzle_no":5,"grid":12,"pair_count":9,"pairs":[{"id":1,"start":[10,3],"end":[8,1]},{"id":2,"start":[9,1],"end":[3,1]},{"id":3,"start":[3,0],"end":[2,2]},{"id":4,"start":[2,3],"end":[0,9]},{"id":5,"start":[0,10],"end":[9,10]},{"id":6,"start":[8,10],"end":[7,5]},{"id":7,"start":[7,4],"end":[9,6]},{"id":8,"start":[9,7],"end":[4,7]},{"id":9,"start":[3,7],"end":[3,9]}],"solution":[{"id":1,"path":[[10,3],[11,3],[11,2],[11,1],[11,0],[10,0],[10,1],[10,2],[9,2],[8,2],[7,2],[6,2],[6,1],[7,1],[8,1]]},{"id":2,"path":[[9,1],[9,0],[8,0],[7,0],[6,0],[5,0],[4,0],[4,1],[5,1],[5,2],[4,2],[4,3],[4,4],[3,4],[3,3],[3,2],[3,1]]},{"id":3,"path":[[3,0],[2,0],[2,1],[1,1],[1,0],[0,0],[0,1],[0,2],[1,2],[2,2]]},{"id":4,"path":[[2,3],[1,3],[0,3],[0,4],[0,5],[0,6],[1,6],[1,5],[1,4],[2,4],[2,5],[3,5],[4,5],[5,5],[5,6],[4,6],[3,6],[2,6],[2,7],[1,7],[0,7],[0,8],[0,9]]},{"id":5,"path":[[0,10],[0,11],[1,11],[2,11],[3,11],[4,11],[5,11],[6,11],[7,11],[8,11],[9,11],[10,11],[11,11],[11,10],[10,10],[9,10]]},{"id":6,"path":[[8,10],[8,9],[9,9],[9,8],[10,8],[10,9],[11,9],[11,8],[11,7],[10,7],[10,6],[11,6],[11,5],[11,4],[10,4],[10,5],[9,5],[9,4],[9,3],[8,3],[8,4],[8,5],[7,5]]},{"id":7,"path":[[7,4],[7,3],[6,3],[5,3],[5,4],[6,4],[6,5],[6,6],[6,7],[7,7],[7,6],[8,6],[9,6]]},{"id":8,"path":[[9,7],[8,7],[8,8],[7,8],[7,9],[7,10],[6,10],[5,10],[5,9],[6,9],[6,8],[5,8],[5,7],[4,7]]},{"id":9,"path":[[3,7],[3,8],[4,8],[4,9],[4,10],[3,10],[2,10],[1,10],[1,9],[1,8],[2,8],[2,9],[3,9]]}],"metrics":{"solution_turns":75,"avg_path_cells":16}},{"id":"GN-MS-0006","level":"Master","puzzle_no":6,"grid":12,"pair_count":9,"pairs":[{"id":1,"start":[8,8],"end":[6,4]},{"id":2,"start":[5,4],"end":[7,5]},{"id":3,"start":[8,5],"end":[11,4]},{"id":4,"start":[11,3],"end":[9,3]},{"id":5,"start":[10,3],"end":[3,0]},{"id":6,"start":[2,0],"end":[1,7]},{"id":7,"start":[1,6],"end":[7,9]},{"id":8,"start":[7,10],"end":[5,11]},{"id":9,"start":[4,11],"end":[1,8]}],"solution":[{"id":1,"path":[[8,8],[8,7],[7,7],[6,7],[5,7],[5,6],[4,6],[3,6],[3,5],[3,4],[3,3],[3,2],[4,2],[5,2],[5,1],[6,1],[6,2],[6,3],[6,4]]},{"id":2,"path":[[5,4],[5,3],[4,3],[4,4],[4,5],[5,5],[6,5],[6,6],[7,6],[7,5]]},{"id":3,"path":[[8,5],[8,6],[9,6],[10,6],[10,7],[9,7],[9,8],[10,8],[10,9],[11,9],[11,8],[11,7],[11,6],[11,5],[11,4]]},{"id":4,"path":[[11,3],[11,2],[10,2],[10,1],[11,1],[11,0],[10,0],[9,0],[8,0],[8,1],[9,1],[9,2],[8,2],[8,3],[9,3]]},{"id":5,"path":[[10,3],[10,4],[10,5],[9,5],[9,4],[8,4],[7,4],[7,3],[7,2],[7,1],[7,0],[6,0],[5,0],[4,0],[4,1],[3,1],[3,0]]},{"id":6,"path":[[2,0],[1,0],[0,0],[0,1],[1,1],[2,1],[2,2],[1,2],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[1,7]]},{"id":7,"path":[[1,6],[1,5],[1,4],[1,3],[2,3],[2,4],[2,5],[2,6],[2,7],[3,7],[4,7],[4,8],[5,8],[6,8],[7,8],[7,9]]},{"id":8,"path":[[7,10],[8,10],[8,9],[9,9],[9,10],[10,10],[11,10],[11,11],[10,11],[9,11],[8,11],[7,11],[6,11],[6,10],[6,9],[5,9],[5,10],[5,11]]},{"id":9,"path":[[4,11],[3,11],[2,11],[1,11],[0,11],[0,10],[1,10],[2,10],[3,10],[4,10],[4,9],[3,9],[3,8],[2,8],[2,9],[1,9],[0,9],[0,8],[1,8]]}],"metrics":{"solution_turns":72,"avg_path_cells":16}},{"id":"GN-MS-0007","level":"Master","puzzle_no":7,"grid":12,"pair_count":9,"pairs":[{"id":1,"start":[4,9],"end":[0,9]},{"id":2,"start":[1,9],"end":[8,11]},{"id":3,"start":[9,11],"end":[11,6]},{"id":4,"start":[11,5],"end":[10,0]},{"id":5,"start":[9,0],"end":[5,0]},{"id":6,"start":[4,0],"end":[0,7]},{"id":7,"start":[1,7],"end":[5,4]},{"id":8,"start":[4,4],"end":[8,4]},{"id":9,"start":[8,5],"end":[8,10]}],"solution":[{"id":1,"path":[[4,9],[4,10],[5,10],[5,9],[6,9],[6,8],[5,8],[4,8],[3,8],[3,9],[3,10],[2,10],[2,9],[2,8],[1,8],[0,8],[0,9]]},{"id":2,"path":[[1,9],[1,10],[0,10],[0,11],[1,11],[2,11],[3,11],[4,11],[5,11],[6,11],[6,10],[7,10],[7,11],[8,11]]},{"id":3,"path":[[9,11],[9,10],[10,10],[10,11],[11,11],[11,10],[11,9],[10,9],[9,9],[9,8],[10,8],[11,8],[11,7],[11,6]]},{"id":4,"path":[[11,5],[11,4],[11,3],[11,2],[10,2],[9,2],[9,1],[10,1],[11,1],[11,0],[10,0]]},{"id":5,"path":[[9,0],[8,0],[8,1],[8,2],[7,2],[6,2],[5,2],[4,2],[4,1],[5,1],[6,1],[7,1],[7,0],[6,0],[5,0]]},{"id":6,"path":[[4,0],[3,0],[3,1],[3,2],[2,2],[1,2],[1,1],[2,1],[2,0],[1,0],[0,0],[0,1],[0,2],[0,3],[1,3],[1,4],[0,4],[0,5],[0,6],[0,7]]},{"id":7,"path":[[1,7],[2,7],[3,7],[4,7],[5,7],[5,6],[4,6],[3,6],[2,6],[1,6],[1,5],[2,5],[2,4],[2,3],[3,3],[3,4],[3,5],[4,5],[5,5],[5,4]]},{"id":8,"path":[[4,4],[4,3],[5,3],[6,3],[6,4],[6,5],[6,6],[6,7],[7,7],[7,6],[7,5],[7,4],[7,3],[8,3],[9,3],[10,3],[10,4],[9,4],[8,4]]},{"id":9,"path":[[8,5],[9,5],[10,5],[10,6],[10,7],[9,7],[9,6],[8,6],[8,7],[8,8],[7,8],[7,9],[8,9],[8,10]]}],"metrics":{"solution_turns":72,"avg_path_cells":16}},{"id":"GN-MS-0008","level":"Master","puzzle_no":8,"grid":12,"pair_count":9,"pairs":[{"id":1,"start":[7,11],"end":[7,6]},{"id":2,"start":[8,6],"end":[6,6]},{"id":3,"start":[6,7],"end":[2,11]},{"id":4,"start":[1,11],"end":[1,5]},{"id":5,"start":[0,5],"end":[4,1]},{"id":6,"start":[5,1],"end":[3,3]},{"id":7,"start":[2,3],"end":[4,4]},{"id":8,"start":[5,4],"end":[11,1]},{"id":9,"start":[11,2],"end":[8,11]}],"solution":[{"id":1,"path":[[7,11],[7,10],[8,10],[9,10],[10,10],[10,9],[9,9],[8,9],[8,8],[9,8],[9,7],[8,7],[7,7],[7,6]]},{"id":2,"path":[[8,6],[9,6],[9,5],[9,4],[10,4],[10,3],[9,3],[8,3],[8,4],[8,5],[7,5],[6,5],[5,5],[5,6],[6,6]]},{"id":3,"path":[[6,7],[5,7],[5,8],[6,8],[7,8],[7,9],[6,9],[6,10],[6,11],[5,11],[5,10],[5,9],[4,9],[4,10],[4,11],[3,11],[2,11]]},{"id":4,"path":[[1,11],[0,11],[0,10],[1,10],[2,10],[3,10],[3,9],[2,9],[2,8],[1,8],[1,9],[0,9],[0,8],[0,7],[0,6],[1,6],[1,7],[2,7],[2,6],[2,5],[1,5]]},{"id":5,"path":[[0,5],[0,4],[0,3],[0,2],[1,2],[1,1],[0,1],[0,0],[1,0],[2,0],[2,1],[2,2],[3,2],[3,1],[3,0],[4,0],[4,1]]},{"id":6,"path":[[5,1],[5,0],[6,0],[6,1],[6,2],[6,3],[5,3],[5,2],[4,2],[4,3],[3,3]]},{"id":7,"path":[[2,3],[1,3],[1,4],[2,4],[3,4],[3,5],[3,6],[3,7],[3,8],[4,8],[4,7],[4,6],[4,5],[4,4]]},{"id":8,"path":[[5,4],[6,4],[7,4],[7,3],[7,2],[7,1],[7,0],[8,0],[9,0],[9,1],[8,1],[8,2],[9,2],[10,2],[10,1],[10,0],[11,0],[11,1]]},{"id":9,"path":[[11,2],[11,3],[11,4],[11,5],[10,5],[10,6],[11,6],[11,7],[10,7],[10,8],[11,8],[11,9],[11,10],[11,11],[10,11],[9,11],[8,11]]}],"metrics":{"solution_turns":80,"avg_path_cells":16}}]};
+const COLORS=["#4fd3ff","#ff647c","#ffd166","#59d69f","#a88cff","#ff9f43","#43e0c1","#f07ee6","#c8ff6b"];
+const SHAPES=["●","◆","▲","■","✦","⬟","✚","★","⬢"];
+const LEVELS=["WarmUp","Beginner","Easy","Medium","Hard","Expert","Master"];
+const STORAGE="gooleeNumberlinkV44QA";
+const defaultState={energy:0,solved:{},best:{},history:[],telemetry:[],settings:{soundLevel:"medium",reduced:false,contrast:false,haptic:true,thinkingSpace:true},last:{level:"WarmUp",puzzle:1}};
+let state;
+try{state=Object.assign({},defaultState,JSON.parse(localStorage.getItem(STORAGE)||"{}"));}catch(e){state=structuredClone(defaultState)}
+state.solved=state.solved||{};state.best=state.best||{};state.history=state.history||[];state.telemetry=state.telemetry||[];state.settings=Object.assign({},defaultState.settings,state.settings||{});
+if(typeof state.settings.sound==="boolean" && !state.settings.soundLevel) state.settings.soundLevel=state.settings.sound?"medium":"off";
+delete state.settings.sound;
+let level="WarmUp", puzzleNo=1, puzzle=null, elapsed=0, timer=null, moves=0,invalid=0,hints=0,paused=false,started=false,activeId=null,activePath=[],paths={},drawing=false,lastCell=null;
+
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(STORAGE,JSON.stringify(state))}
+function key(){return puzzle.id}
+function emit(type,data={}){state.telemetry.push({t:Date.now(),type,puzzle:puzzle?puzzle.id:null,...data}); if(state.telemetry.length>5000)state.telemetry=state.telemetry.slice(-5000); save()}
+function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),1400)}
+function feedback(title,msg,kind=""){$("feedback").className="feedback "+kind;$("feedback").innerHTML=`<div class="dot"></div><div><b>${title}</b><span>${msg}</span></div>`}
+function soundLabel(){return ({high:"High",medium:"Medium",low:"Low",off:"Off"})[state.settings.soundLevel]||"Medium"}
+function applySettings(){
+ document.body.classList.toggle("reduced",state.settings.reduced);
+ document.body.classList.toggle("contrast",state.settings.contrast);
+ $("soundBtn").textContent="Sound: "+soundLabel();
+}
+function vibration(pattern){if(state.settings.haptic&&navigator.vibrate)navigator.vibrate(pattern)}
+let audioCtx=null,audioUnlocked=false;
+const GAIN={high:0.095,medium:0.062,low:0.032,off:0};
+function unlockAudio(){
+ if(state.settings.soundLevel==="off")return;
+ try{
+   audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+   if(audioCtx.state==="suspended")audioCtx.resume();
+   audioUnlocked=true;
+   const b=audioCtx.createBuffer(1,1,22050),s=audioCtx.createBufferSource();
+   s.buffer=b;s.connect(audioCtx.destination);s.start(0);
+ }catch(e){}
+}
+function tone(freq=520,dur=.045,type="sine",mult=1,delay=0){
+ if(state.settings.soundLevel==="off")return;
+ unlockAudio(); if(!audioCtx)return;
+ try{
+   const when=audioCtx.currentTime+delay,o=audioCtx.createOscillator(),g=audioCtx.createGain();
+   o.type=type;o.frequency.setValueAtTime(freq,when);
+   g.gain.setValueAtTime(Math.max(.001,GAIN[state.settings.soundLevel]*mult),when);
+   g.gain.exponentialRampToValueAtTime(.001,when+dur);
+   o.connect(g);g.connect(audioCtx.destination);o.start(when);o.stop(when+dur+.01);
+ }catch(e){}
+}
+function pairPitch(id){return 300+(Number(id)-1)*38}
+function sfx(name,id=1){
+ const base=pairPitch(id);
+ if(name==="select"){tone(base,.060,"triangle",.85);tone(base*1.5,.035,"sine",.28,.018)}
+ if(name==="step"){
+   // Movement cue intentionally stronger than v4: short, bright and audible on phone speakers.
+   tone(Math.min(980,base+260),.050,"square",.62);
+   tone(Math.min(1180,base+430),.032,"sine",.24,.008);
+ }
+ if(name==="retract")tone(Math.max(180,base-45),.032,"triangle",.24);
+ if(name==="pair"){tone(base+220,.080,"sine",.78);tone(base+330,.105,"sine",.92,.072)}
+ if(name==="bad"){tone(175,.070,"triangle",.42);tone(145,.055,"sine",.24,.045)}
+ if(name==="win"){[520,660,820,1040].forEach((f,i)=>tone(f,.13,"sine",1,i*.085))}
+ if(name==="hint"){tone(460,.060,"triangle",.42);tone(560,.050,"sine",.28,.055)}
+ if(name==="presence"){tone(392,.11,"sine",.24);tone(523,.15,"sine",.20,.11)}
+}
+
+let idleTimer=null,lastPlayerAction=Date.now(),idleStage=0,pauseStartTs=null,pauseContext=null,pausePathLen=0;
+function currentPauseContext(){
+ if(drawing&&activeId)return "mid_path";
+ if(Object.keys(paths).length===0)return "before_first_path";
+ return "between_actions";
+}
+function clearThinkingSpaceVisuals(){
+ const b=$("board"); if(b)b.classList.remove("thinking-breathe");
+ document.querySelectorAll(".thinking-head").forEach(x=>x.classList.remove("thinking-head"));
+ const h=$("hintBtn");if(h)h.classList.remove("thinking-hint");
+}
+function markActiveHeadThinking(){
+ if(!(drawing&&activeId&&activePath.length))return;
+ let z=activePath.at(-1);
+ let c=document.querySelector(`.cell[data-r="${z[0]}"][data-c="${z[1]}"]`);
+ if(c)c.classList.add("thinking-head");
+}
+function finishObservedPause(action){
+ if(!pauseStartTs)return;
+ const dur=Math.max(0,(Date.now()-pauseStartTs)/1000);
+ emit("thinking_space_end",{duration_sec:+dur.toFixed(1),context:pauseContext,active_pair:activeId||null,path_len_before_pause:pausePathLen,action_after_pause:action});
+ pauseStartTs=null;pauseContext=null;pausePathLen=0;
+}
+function playerAction(action="interaction"){
+ if(started&&!paused)finishObservedPause(action);
+ lastPlayerAction=Date.now();idleStage=0;clearThinkingSpaceVisuals();if(activeId&&livingMood[activeId]==="living-think")delete livingMood[activeId];
+}
+function beginObservedPause(){
+ if(pauseStartTs)return;
+ pauseStartTs=Date.now();pauseContext=currentPauseContext();pausePathLen=activePath?.length||0;
+ emit("thinking_space_start",{context:pauseContext,active_pair:activeId||null,path_len:pausePathLen});
+}
+function thinkingSpaceTick(){
+ if(!started||paused||!state.settings.thinkingSpace||$("game").classList.contains("hidden"))return;
+ const sec=(Date.now()-lastPlayerAction)/1000;
+ if(sec>=10&&idleStage<1){
+   idleStage=1;beginObservedPause();
+   $("board").classList.add("thinking-breathe");
+   if(currentPauseContext()==="mid_path"){markActiveHeadThinking();if(activeId)setLivingMood(activeId,"living-think");}
+ }
+ if(sec>=20&&idleStage<2){
+   idleStage=2;sfx("presence");
+   emit("thinking_space_support",{stage:"presence",context:currentPauseContext(),idle_sec:Math.round(sec)});
+ }
+ if(sec>=35&&idleStage<3){
+   idleStage=3;feedback("Take your time.","Continue when you are ready.");
+   emit("thinking_space_support",{stage:"take_your_time",context:currentPauseContext(),idle_sec:Math.round(sec)});
+ }
+ if(sec>=50&&idleStage<4){
+   idleStage=4;$("hintBtn").classList.add("thinking-hint");
+   emit("thinking_space_support",{stage:"hint_discoverable",context:currentPauseContext(),idle_sec:Math.round(sec)});
+ }
+}
+function startThinkingSpace(){
+ clearInterval(idleTimer);lastPlayerAction=Date.now();idleStage=0;pauseStartTs=null;clearThinkingSpaceVisuals();
+ idleTimer=setInterval(thinkingSpaceTick,500);
+}
+function stopThinkingSpace(action="leave"){
+ finishObservedPause(action);clearInterval(idleTimer);idleTimer=null;clearThinkingSpaceVisuals();
+}
+
+function formatTime(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function estimateScore(){
+  // GOOLEE PLAY SCORE™: player-facing 0–10,000 game-performance score.
+  // Prototype v4 weighting; kept separate from Thinking Energy and profiling telemetry.
+  const completionBase=4000;
+  const pathQuality=Math.max(0,2500-(Math.max(0,moves-puzzle.pair_count)*20));
+  const errorControl=Math.max(0,1500-invalid*120);
+  const independence=Math.max(0,1000-hints*250);
+  const timeTarget=Math.max(25,puzzle.grid*puzzle.grid*1.35);
+  const timeEfficiency=Math.max(0,1000-Math.max(0,elapsed-timeTarget)*6);
+  return Math.max(0,Math.min(10000,Math.round(completionBase+pathQuality+errorControl+independence+timeEfficiency)));
+}
+function efficiency(){return Math.max(0,100-invalid*6-hints*12)}
+function updateMetrics(){$("timeMetric").textContent=formatTime(elapsed);$("movesMetric").textContent=moves;$("effMetric").textContent=efficiency()+"%";$("scoreMetric").textContent=estimateScore();$("energyNow").textContent=state.energy}
+function startTimer(){clearInterval(timer);timer=setInterval(()=>{if(!paused){elapsed++;updateMetrics()}},1000)}
+function homeStats(){let solved=Object.keys(state.solved).length,bestVals=Object.values(state.best).map(x=>x.score||0);$("homeEnergy").textContent=state.energy;$("homeSolved").textContent=solved+"/56";$("homeBest").textContent=bestVals.length?Math.max(...bestVals):"—"}
+function levelUnlocked(lv){return true} // QA TEST MODE: all levels unlocked
+function renderHome(){
+ $("home").classList.remove("hidden");$("game").classList.add("hidden");homeStats();
+ let last=state.last||{level:"WarmUp",puzzle:1};$("smartStart").textContent=`${state.solved[BANK[last.level][last.puzzle-1]?.id]?"CONTINUE":"PLAY"} ${last.level.toUpperCase()} · PUZZLE ${last.puzzle}`;
+ $("levelCards").innerHTML=LEVELS.map(lv=>{let ps=BANK[lv],done=ps.filter(p=>state.solved[p.id]).length,un=levelUnlocked(lv),first=ps[0];return `<button class="levelcard ${un?"":"locked"}" data-level="${lv}" ${un?"":"disabled"}><div class="n">${lv}</div><div class="meta">${first.grid}×${first.grid}${lv==="WarmUp"?" · mixed 3–4 pairs":" · "+first.pair_count+" pairs"} · ${done}/8 solved</div><div class="prog"><div class="fill" style="width:${done/8*100}%"></div></div></button>`}).join("");
+ document.querySelectorAll(".levelcard:not(.locked)").forEach(b=>b.onclick=()=>openPuzzlePicker(b.dataset.level));
+}
+function loadPuzzle(lv,no){
+ level=lv;puzzleNo=no;puzzle=BANK[level][no-1];state.last={level,puzzle:no};save();
+ paths={};activeId=null;activePath=[];drawing=false;elapsed=0;moves=0;invalid=0;hints=0;paused=false;started=true;lastCell=null;
+ $("home").classList.add("hidden");$("game").classList.remove("hidden");
+ $("puzzleTitle").textContent=`${level} · Puzzle ${no}`;$("puzzleMeta").textContent=`${puzzle.grid}×${puzzle.grid} · ${puzzle.pair_count} pairs · ${puzzle.id}`;
+ renderBoard();renderScores();updateMetrics();feedback("Ready","Connect matching numbers and fill every cell.");startTimer();startThinkingSpace();emit("puzzle_start",{level,puzzle_no:no,grid:puzzle.grid,pairs:puzzle.pair_count});
+}
+function endpointsAt(r,c){for(let p of puzzle.pairs){if((p.start[0]===r&&p.start[1]===c)||(p.end[0]===r&&p.end[1]===c))return p.id}return null}
+function pathOwner(r,c){for(let id in paths)if(paths[id].some(x=>x[0]===r&&x[1]===c))return Number(id);return null}
+function solutionFor(id){return puzzle.solution.find(x=>x.id===id).path}
+let livingMood={},livingTimers={};
+function faceHTML(){return `<span class="goolee-face" aria-hidden="true"><i class="goolee-eye e1"></i><i class="goolee-eye e2"></i><i class="goolee-mouth"></i></span>`}
+function setLivingMood(id,mood,ms=0){
+ livingMood[id]=mood;renderBoard();
+ if(livingTimers[id])clearTimeout(livingTimers[id]);
+ if(ms)livingTimers[id]=setTimeout(()=>{delete livingMood[id];renderBoard()},ms);
+}
+function celebrateAllButtons(){
+ puzzle.pairs.forEach(x=>livingMood[x.id]="board-celebrate");renderBoard();
+ setTimeout(()=>{livingMood={};renderBoard()},700);
+}
+function renderBoard(){
+ const n=puzzle.grid, b=$("board");b.style.gridTemplateColumns=`repeat(${n},1fr)`;let html="";
+ for(let r=0;r<n;r++)for(let c=0;c<n;c++){let ep=endpointsAt(r,c),owner=pathOwner(r,c),isHead=activeId&&activePath.length&&activePath.at(-1)[0]===r&&activePath.at(-1)[1]===c;let pc=owner?COLORS[owner-1]:ep?COLORS[ep-1]:"#4fd3ff";let mood=ep?(livingMood[ep]||((activeId===ep&&drawing)?"living-active":"")):"";html+=`<div class="cell ${owner?"path":""} ${isHead?"head":""}" data-r="${r}" data-c="${c}" style="--pc:${pc}">${ep?`<div class="endpoint ${pairComplete(ep)?"done":""} ${mood}" style="--pc:${COLORS[ep-1]}">${ep}<span class="shape">${SHAPES[ep-1]}</span>${faceHTML()}</div>`:""}</div>`}
+ b.innerHTML=html;
+}
+function pairComplete(id){let p=paths[id];if(!p||p.length<2)return false;let pair=puzzle.pairs.find(x=>x.id===id),a=p[0],z=p.at(-1);return ((a[0]===pair.start[0]&&a[1]===pair.start[1]&&z[0]===pair.end[0]&&z[1]===pair.end[1])||(a[0]===pair.end[0]&&a[1]===pair.end[1]&&z[0]===pair.start[0]&&z[1]===pair.start[1]))}
+function adjacent(a,b){return Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])===1}
+function beginCell(r,c){
+ playerAction("path_touch");let ep=endpointsAt(r,c),owner=pathOwner(r,c);
+ if(ep){activeId=ep;paths[ep]=[[r,c]];activePath=paths[ep];drawing=true;moves++;emit("path_start",{pair:ep,r,c});unlockAudio();sfx("select",ep);renderBoard();updateMetrics();return}
+ if(owner){activeId=owner;let p=paths[owner],idx=p.findIndex(x=>x[0]===r&&x[1]===c);paths[owner]=p.slice(0,idx+1);activePath=paths[owner];drawing=true;moves++;emit("path_edit",{pair:owner,r,c});sfx("select",owner);renderBoard();updateMetrics()}
+}
+function enterCell(r,c){
+ playerAction("path_move");if(!drawing||!activeId)return;let cur=activePath.at(-1);if(cur[0]===r&&cur[1]===c)return;if(!adjacent(cur,[r,c]))return;
+ let ep=endpointsAt(r,c),owner=pathOwner(r,c);
+ if(owner===activeId){let idx=activePath.findIndex(x=>x[0]===r&&x[1]===c);activePath.splice(idx+1);sfx("retract",activeId);setLivingMood(activeId,"living-think",420);renderBoard();emit("path_retract",{pair:activeId,r,c});return}
+ if(owner&&owner!==activeId){invalid++;sfx("bad");vibration(35);setLivingMood(activeId,"living-puzzled",360);feedback("Blocked","Another path already occupies that cell.","bad");emit("invalid_attempt",{reason:"occupied",pair:activeId,r,c});updateMetrics();return}
+ if(ep&&ep!==activeId){invalid++;sfx("bad");vibration(35);setLivingMood(activeId,"living-puzzled",360);feedback("Wrong endpoint","Connect only to the matching number.","bad");emit("invalid_attempt",{reason:"wrong_endpoint",pair:activeId,r,c,target:ep});updateMetrics();return}
+ activePath.push([r,c]);paths[activeId]=activePath;sfx("step",activeId);emit("cell_enter",{pair:activeId,r,c,path_len:activePath.length});renderBoard();
+ if(ep===activeId&&pairComplete(activeId)){sfx("pair",activeId);vibration(18);setLivingMood(activeId,"living-smile",650);feedback(`Pair ${activeId} connected`,"Good. Continue filling the board.","good");emit("pair_complete",{pair:activeId,path_len:activePath.length});drawing=false;activeId=null;activePath=[];checkWin()}
+}
+function endDraw(){drawing=false;activeId=null;activePath=[];renderBoard();lastPlayerAction=Date.now();idleStage=0;clearThinkingSpaceVisuals()}
+function checkWin(){let full=Object.values(paths).reduce((a,p)=>a+p.length,0)===puzzle.grid*puzzle.grid;let all=puzzle.pairs.every(x=>pairComplete(x.id));if(all&&full)completePuzzle();else if(all&&!full)feedback("Pairs connected","Some cells are still empty. Reroute to fill the entire board.","bad")}
+function completePuzzle(){
+ stopThinkingSpace("puzzle_complete");clearInterval(timer);let score=estimateScore(),eff=efficiency(),clean=invalid===0,perfect=clean&&hints===0,first=!state.solved[key()],old=state.best[key()];
+ state.solved[key()]=true;if(!old||score>old.score)state.best[key()]={score,time:elapsed,moves,eff};
+ let gain=25+(clean?10:0)+(perfect?15:0)+(first?10:0);state.energy+=gain;
+ state.history.unshift({puzzle:key(),level,number:puzzleNo,score,time:elapsed,moves,eff,clean,perfect,ts:Date.now()});state.history=state.history.slice(0,80);save();emit("puzzle_complete",{score,time:elapsed,moves,eff,clean,perfect,energy_gain:gain});
+ sfx("win");vibration([30,40,50]);celebrateAllButtons();if(!state.settings.reduced)confetti();
+ let badges=`${clean?'<span class="achievement">CLEAN SOLVE</span>':""}${perfect?'<span class="achievement">PERFECT FLOW</span>':""}${old&&score>old.score?'<span class="achievement">NEW PERSONAL BEST</span>':""}`;
+ showModal(`<h2>Puzzle Complete</h2><p><b>${puzzle.id}</b> solved with ${eff}% efficiency.</p>${badges}<div class="metricGrid" style="margin-top:14px"><div class="metric"><span>PLAY SCORE</span><b>${score}</b></div><div class="metric"><span>TIME</span><b>${formatTime(elapsed)}</b></div><div class="metric"><span>MOVES</span><b>${moves}</b></div><div class="metric"><span>ENERGY +</span><b>${gain}</b></div></div><div class="modalActions"><button class="primary" id="nextPuzzle">NEXT PUZZLE</button><button class="secondary" id="retryPuzzle">PLAY AGAIN</button><button class="white" id="homeModal">BACK TO MAIN MENU</button></div>`);
+ $("nextPuzzle").onclick=()=>{hideModal();let next=puzzleNo<8?puzzleNo+1:1,lv=puzzleNo<8?level:LEVELS[Math.min(LEVELS.length-1,LEVELS.indexOf(level)+1)];loadPuzzle(lv,next)};
+ $("retryPuzzle").onclick=()=>{hideModal();loadPuzzle(level,puzzleNo)};$("homeModal").onclick=()=>{hideModal();stopThinkingSpace("back_to_menu");clearInterval(timer);renderHome()};
+ renderScores();updateMetrics();
+}
+function confetti(){for(let i=0;i<38;i++){let d=document.createElement("div");d.className="confetti";d.style.left=(Math.random()*100)+"vw";d.style.top=(-10-Math.random()*20)+"vh";d.style.background=COLORS[i%COLORS.length];d.style.animationDelay=(Math.random()*.25)+"s";document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}}
+function renderScores(){let rows=state.history.filter(x=>x.puzzle===key()).slice(0,8);$("scoreList").innerHTML=rows.length?rows.map((x,i)=>`<div class="scoreRow"><div><b>${i===0?"Latest":"Attempt "+(i+1)}</b><small>${formatTime(x.time)} · ${x.moves} moves · ${x.eff}%</small></div><b>${x.score}</b></div>`).join(""):`<div class="sideNote">No successful attempt yet.</div>`}
+function hint(){
+ playerAction("hint");hints++;let target=puzzle.pairs.find(x=>!pairComplete(x.id));if(!target){feedback("Hint","All pairs are connected. Look for empty cells and reroute.");return}
+ let sol=solutionFor(target.id),cur=paths[target.id]||[],next=sol[0];
+ if(cur.length){let end=cur.at(-1),idx=sol.findIndex(x=>x[0]===end[0]&&x[1]===end[1]);if(idx>=0&&idx<sol.length-1)next=sol[idx+1]}
+ document.querySelectorAll(".cell").forEach(c=>{if(Number(c.dataset.r)===next[0]&&Number(c.dataset.c)===next[1]){c.style.boxShadow="inset 0 0 0 3px #ffd166,0 0 18px rgba(255,209,102,.8)";setTimeout(()=>c.style.boxShadow="",1300)}});
+ feedback("Hint",`Consider pair ${target.id}. A useful next space has been highlighted.`,"good");sfx("hint");emit("hint_use",{pair:target.id,r:next[0],c:next[1]});updateMetrics()
+}
+function resetPuzzle(confirmFirst=true){if(confirmFirst){showModal(`<h2>Reset puzzle?</h2><p>This clears your current paths. Your previous successful scores remain saved.</p><div class="modalActions"><button class="primary" id="confirmReset">RESET CURRENT PUZZLE</button><button class="secondary" id="cancelReset">CANCEL</button></div>`);$("confirmReset").onclick=()=>{hideModal();resetPuzzle(false)};$("cancelReset").onclick=hideModal;return}paths={};elapsed=0;moves=0;invalid=0;hints=0;renderBoard();updateMetrics();feedback("Puzzle reset","Start again when you are ready.");emit("reset");startTimer();startThinkingSpace()}
+function pause(){playerAction("pause_button");paused=true;clearThinkingSpaceVisuals();emit("pause");showModal(`<h2>Paused</h2><p>${puzzle.id} is paused. Your current paths are preserved.</p><div class="modalActions"><button class="primary" id="resume">RESUME</button><button class="white" id="pauseHome">BACK TO MAIN MENU</button></div>`);$("resume").onclick=()=>{paused=false;hideModal();playerAction("resume");emit("resume")};$("pauseHome").onclick=()=>{paused=false;hideModal();stopThinkingSpace("back_to_menu");clearInterval(timer);renderHome()}}
+function showModal(content){$("modalCard").innerHTML=content;$("modal").classList.remove("hidden")}
+function hideModal(){$("modal").classList.add("hidden")}
+function openPuzzlePicker(lv){
+ let ps=BANK[lv];showModal(`<h2>${lv}</h2><p>Choose one of the eight puzzles.</p><div class="levelselect">${ps.map((p,i)=>`<button class="puzzleBtn ${state.solved[p.id]?"done":""}" data-no="${i+1}">${i+1}</button>`).join("")}</div><div class="modalActions"><button class="secondary" id="closePicker">CLOSE</button></div>`);
+ document.querySelectorAll(".puzzleBtn").forEach(b=>b.onclick=()=>{hideModal();loadPuzzle(lv,Number(b.dataset.no))});$("closePicker").onclick=hideModal
+}
+function settings(){
+ showModal(`<h2>Settings</h2><p>Adjust feedback without changing puzzle rules.</p>
+ <div class="settingsRow"><div><b>Sound Effects</b><div class="sideNote">High / Medium / Low / Off · Medium recommended</div></div><button class="switch ${state.settings.soundLevel!=="off"?"on":""}" id="soundLevelSetting">${soundLabel()}</button></div>
+ <div class="settingsRow"><div><b>Haptic Feedback</b><div class="sideNote">Uses device vibration when supported</div></div><button class="switch ${state.settings.haptic?"on":""}" data-set="haptic">${state.settings.haptic?"ON":"OFF"}</button></div>
+ <div class="settingsRow"><div><b>Reduced Motion</b><div class="sideNote">Minimises animated effects</div></div><button class="switch ${state.settings.reduced?"on":""}" data-set="reduced">${state.settings.reduced?"ON":"OFF"}</button></div>
+ <div class="settingsRow"><div><b>High Contrast</b><div class="sideNote">Adds stronger endpoint distinction and symbols</div></div><button class="switch ${state.settings.contrast?"on":""}" data-set="contrast">${state.settings.contrast?"ON":"OFF"}</button></div>
+ <div class="settingsRow"><div><b>Thinking-Space Support</b><div class="sideNote">Protects quiet thinking time, then offers restrained non-directional support</div></div><button class="switch ${state.settings.thinkingSpace?"on":""}" data-set="thinkingSpace">${state.settings.thinkingSpace?"ON":"OFF"}</button></div>
+ <div class="modalActions"><button class="secondary" id="testSound">TEST MOVEMENT SOUND</button><button class="white" id="closeSettings">DONE</button></div>`);
+ document.querySelectorAll("[data-set]").forEach(b=>b.onclick=()=>{let k=b.dataset.set;state.settings[k]=!state.settings[k];if(k==="thinkingSpace"){playerAction("thinking_space_setting");if(!state.settings.thinkingSpace)clearThinkingSpaceVisuals()}save();applySettings();settings()});
+ $("soundLevelSetting").onclick=()=>{const seq=["off","low","medium","high"];let i=seq.indexOf(state.settings.soundLevel);state.settings.soundLevel=seq[(i+1)%seq.length];save();applySettings();unlockAudio();settings()};
+ $("testSound").onclick=()=>{unlockAudio();let i=0;const demo=setInterval(()=>{sfx("step",3);if(++i>=6){clearInterval(demo);setTimeout(()=>sfx("pair",3),90)}},95)};
+ $("closeSettings").onclick=hideModal
+}
+$("smartStart").onclick=()=>{let l=state.last||{level:"WarmUp",puzzle:1};loadPuzzle(l.level,l.puzzle)};
+$("settingsTop").onclick=settings;$("hintBtn").onclick=hint;$("pauseBtn").onclick=pause;$("resetBtn").onclick=()=>resetPuzzle(true);$("backBtn").onclick=()=>{stopThinkingSpace("back_to_menu");clearInterval(timer);emit("back_to_menu");renderHome()};$("choosePuzzle").onclick=()=>openPuzzlePicker(level);$("soundBtn").onclick=()=>{const seq=["off","low","medium","high"];let i=seq.indexOf(state.settings.soundLevel);state.settings.soundLevel=seq[(i+1)%seq.length];save();applySettings();unlockAudio();toast("Sound effects: "+soundLabel())};
+const board=$("board");
+function cellFromEvent(e){let t=e.target.closest(".cell");return t?{r:Number(t.dataset.r),c:Number(t.dataset.c)}:null}
+board.addEventListener("pointerdown",e=>{e.preventDefault();unlockAudio();let q=cellFromEvent(e);if(q)beginCell(q.r,q.c)});
+function processPointerPosition(x,y){
+ if(!drawing)return;
+ let el=document.elementFromPoint(x,y),t=el&&el.closest(".cell");
+ if(t&&board.contains(t)){
+   let r=Number(t.dataset.r),c=Number(t.dataset.c),sig=r+","+c;
+   if(sig!==lastCell){lastCell=sig;enterCell(r,c)}
+ }
+}
+board.addEventListener("pointermove",e=>{processPointerPosition(e.clientX,e.clientY)});
+board.addEventListener("touchmove",e=>{
+ if(!drawing||!e.touches||!e.touches.length)return;
+ e.preventDefault();
+ const t=e.touches[0];processPointerPosition(t.clientX,t.clientY);
+},{passive:false});
+board.addEventListener("pointerup",e=>{lastCell=null;endDraw()});
+board.addEventListener("pointercancel",e=>{lastCell=null;endDraw()});
+applySettings();renderHome();
+</script>
+<script>
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+</script></body></html>
